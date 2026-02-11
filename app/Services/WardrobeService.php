@@ -6,7 +6,6 @@ use App\Models\Garment;
 use App\Models\ModelImage;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class WardrobeService
 {
@@ -30,21 +29,11 @@ class WardrobeService
 
     public function deleteGarment(Garment $garment): void
     {
-        Storage::disk('public')->delete($garment->path);
-        if ($garment->thumbnail_path) {
-            Storage::disk('public')->delete($garment->thumbnail_path);
-        }
-
         $garment->delete();
     }
 
     public function deleteModelImage(ModelImage $modelImage): void
     {
-        Storage::disk('public')->delete($modelImage->path);
-        if ($modelImage->thumbnail_path) {
-            Storage::disk('public')->delete($modelImage->thumbnail_path);
-        }
-
         $modelImage->delete();
     }
 }

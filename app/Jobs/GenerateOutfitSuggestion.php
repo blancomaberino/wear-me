@@ -29,8 +29,7 @@ class GenerateOutfitSuggestion implements ShouldQueue
             $suggestions = $service->generateSuggestions($this->user, $this->occasion);
 
             foreach ($suggestions as $suggestion) {
-                $outfitSuggestion = OutfitSuggestion::create([
-                    'user_id' => $this->user->id,
+                $outfitSuggestion = $this->user->outfitSuggestions()->create([
                     'garment_ids' => $suggestion['garment_ids'] ?? [],
                     'suggestion_text' => $suggestion['suggestion'] ?? '',
                     'occasion' => $this->occasion,
@@ -39,7 +38,7 @@ class GenerateOutfitSuggestion implements ShouldQueue
                 // Attach garments to pivot table (only those that exist)
                 $garmentIds = $suggestion['garment_ids'] ?? [];
                 if (!empty($garmentIds)) {
-                    $existingIds = \App\Models\Garment::whereIn('id', $garmentIds)->pluck('id')->all();
+                    $existingIds = $this->user->garments()->whereIn('id', $garmentIds)->pluck('id')->all();
                     $pivotData = [];
                     foreach ($garmentIds as $index => $garmentId) {
                         if (in_array($garmentId, $existingIds)) {

@@ -22,7 +22,10 @@ class GarmentController extends Controller
         $query = $request->user()->garments()->latest();
 
         if ($request->has('category') && $request->category !== 'all') {
-            $query->where('category', $request->category);
+            $category = GarmentCategory::tryFrom($request->category);
+            if ($category) {
+                $query->where('category', $category);
+            }
         }
 
         return Inertia::render('Wardrobe/Index', [

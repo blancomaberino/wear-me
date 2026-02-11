@@ -40,8 +40,7 @@ class TryOnVideoController extends Controller
     {
         $tryOnResult = $request->user()->tryonResults()->findOrFail($request->tryon_result_id);
 
-        $video = TryOnVideo::create([
-            'user_id' => $request->user()->id,
+        $video = $request->user()->tryonVideos()->create([
             'tryon_result_id' => $tryOnResult->id,
             'model_image_id' => $tryOnResult->model_image_id,
             'garment_id' => $tryOnResult->garment_id,

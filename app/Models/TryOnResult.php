@@ -16,7 +16,6 @@ class TryOnResult extends Model
     protected $table = 'tryon_results';
 
     protected $fillable = [
-        'user_id',
         'model_image_id',
         'source_tryon_result_id',
         'garment_id',

@@ -7,6 +7,11 @@ use App\Models\User;
 
 class GarmentPolicy
 {
+    public function view(User $user, Garment $garment): bool
+    {
+        return $garment->user_id === $user->id;
+    }
+
     public function update(User $user, Garment $garment): bool
     {
         return $garment->user_id === $user->id;

@@ -46,8 +46,7 @@ class TryOnService
 
         $promptHint = $request->prompt_hint ?? $this->buildPromptHint($garments);
 
-        $tryOnResult = TryOnResult::create([
-            'user_id' => $user->id,
+        $tryOnResult = $user->tryonResults()->create([
             'model_image_id' => $modelImageId,
             'source_tryon_result_id' => $sourceResult?->id,
             'garment_id' => $garments->first()->id,

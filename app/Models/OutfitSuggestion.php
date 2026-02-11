@@ -11,7 +11,6 @@ class OutfitSuggestion extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id',
         'garment_ids',
         'suggestion_text',
         'occasion',
@@ -50,6 +49,8 @@ class OutfitSuggestion extends Model
         }
 
         // Legacy fallback: load from JSON column
-        return Garment::whereIn('id', $this->garment_ids ?? [])->get();
+        return Garment::whereIn('id', $this->garment_ids ?? [])
+            ->where('user_id', $this->user_id)
+            ->get();
     }
 }

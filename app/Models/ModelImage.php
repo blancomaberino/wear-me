@@ -14,7 +14,6 @@ class ModelImage extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
         'path',
         'original_filename',
         'thumbnail_path',

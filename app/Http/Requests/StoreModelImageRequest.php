@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreTryOnVideoRequest extends FormRequest
+class StoreModelImageRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,7 @@ class StoreTryOnVideoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tryon_result_id' => 'required|integer|exists:tryon_results,id',
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreModelImageRequest;
 use App\Http\Resources\ModelImageResource;
 use App\Models\ModelImage;
 use App\Services\WardrobeService;
@@ -23,12 +24,8 @@ class ModelImageController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreModelImageRequest $request)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
-        ]);
-
         if ($request->user()->modelImages()->count() >= 50) {
             return redirect()->back()->withErrors(['image' => 'Maximum of 50 photos allowed.']);
         }

@@ -14,7 +14,6 @@ class TryOnVideo extends Model
     protected $table = 'tryon_videos';
 
     protected $fillable = [
-        'user_id',
         'tryon_result_id',
         'model_image_id',
         'garment_id',
