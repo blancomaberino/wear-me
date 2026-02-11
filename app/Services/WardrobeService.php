@@ -10,14 +10,25 @@ use Illuminate\Http\UploadedFile;
 class WardrobeService
 {
     public function __construct(
-        private ImageProcessingService $imageService
+        private ImageProcessingService $imageService,
+        private DuplicateDetectionService $duplicateService,
     ) {}
 
     public function storeGarment(User $user, array $data, UploadedFile $image): Garment
     {
         $imageData = $this->imageService->processAndStore($image, 'garments');
 
-        return $user->garments()->create(array_merge($imageData, $data));
+        $garment = $user->garments()->create(array_merge($imageData, $data));
+
+        // Compute and store perceptual hash
+        try {
+            $hash = $this->duplicateService->computeHash($garment->path);
+            $garment->update(['perceptual_hash' => $hash]);
+        } catch (\Throwable $e) {
+            // Non-critical: don't fail the upload if hash computation fails
+        }
+
+        return $garment;
     }
 
     public function storeModelImage(User $user, UploadedFile $image): ModelImage

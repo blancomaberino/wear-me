@@ -14,6 +14,8 @@ export default {
   saved: 'Saved',
   unsave: 'Unsave',
   close: 'Close',
+  retry: 'Try Again',
+  selected: 'selected',
   cm: 'cm',
   kg: 'kg',
   stepOf: 'Step {{current}} of {{total}}',

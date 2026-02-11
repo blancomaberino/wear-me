@@ -8,6 +8,9 @@ import {
     Shirt,
     Wand2,
     Sparkles,
+    BookOpen,
+    Video,
+    Luggage,
     User,
     LogOut,
     ChevronDown,
@@ -31,6 +34,9 @@ function Sidebar({ className }: SidebarProps) {
         { name: t('nav.wardrobe'), route: 'wardrobe.index', icon: Shirt },
         { name: t('nav.tryOn'), route: 'tryon.index', icon: Wand2 },
         { name: t('nav.outfits'), route: 'outfits.index', icon: Sparkles },
+        { name: t('nav.lookbooks'), route: 'lookbooks.index', icon: BookOpen },
+        { name: t('nav.videos'), route: 'videos.index', icon: Video },
+        { name: t('nav.packing'), route: 'packing-lists.index', icon: Luggage },
     ];
 
     return (

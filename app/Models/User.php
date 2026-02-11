@@ -73,6 +73,31 @@ class User extends Authenticatable
         return $this->hasMany(OutfitSuggestion::class);
     }
 
+    public function lookbooks(): HasMany
+    {
+        return $this->hasMany(Lookbook::class);
+    }
+
+    public function shareLinks(): HasMany
+    {
+        return $this->hasMany(ShareLink::class);
+    }
+
+    public function outfits(): HasMany
+    {
+        return $this->hasMany(Outfit::class);
+    }
+
+    public function packingLists(): HasMany
+    {
+        return $this->hasMany(PackingList::class);
+    }
+
+    public function exports(): HasMany
+    {
+        return $this->hasMany(Export::class);
+    }
+
     public function hasMeasurements(): bool
     {
         return $this->height_cm !== null

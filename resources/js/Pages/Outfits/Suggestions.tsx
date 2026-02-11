@@ -11,6 +11,7 @@ import { OutfitSuggestion, WardrobeStats } from '@/types';
 import { useState } from 'react';
 import { Sparkles, Wand2, Heart, Bookmark } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { HarmonyBadge } from '@/Components/HarmonyBadge';
 
 interface Props {
     suggestions: OutfitSuggestion[];
@@ -95,6 +96,14 @@ export default function Suggestions({ suggestions, wardrobeStats, currentOccasio
 
                                 {suggestion.occasion && (
                                     <Badge variant="brand" size="sm" className="mb-3">{suggestion.occasion}</Badge>
+                                )}
+
+                                {suggestion.garments.length >= 2 && (
+                                    <HarmonyBadge
+                                        colors={suggestion.garments.flatMap((g: any) => g.color_tags || [])}
+                                        score={suggestion.harmony_score}
+                                        className="mb-3"
+                                    />
                                 )}
 
                                 <div className="flex items-center gap-2">

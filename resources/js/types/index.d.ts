@@ -55,6 +55,9 @@ export interface Garment {
     size_label?: string | null;
     brand?: string | null;
     material?: string | null;
+    source_url?: string | null;
+    source_provider?: string | null;
+    perceptual_hash?: string | null;
     measurement_chest_cm?: number | null;
     measurement_length_cm?: number | null;
     measurement_waist_cm?: number | null;
@@ -120,6 +123,7 @@ export interface OutfitSuggestion {
     suggestion_text: string;
     occasion: string | null;
     is_saved: boolean;
+    harmony_score?: number | null;
     created_at: string;
 }
 
@@ -144,4 +148,104 @@ export interface WardrobeStats {
     upper: number;
     lower: number;
     dress: number;
+}
+
+export interface Lookbook {
+    id: number;
+    name: string;
+    description: string | null;
+    cover_image_url: string | null;
+    is_public: boolean;
+    slug: string;
+    items_count: number;
+    items?: LookbookItem[];
+    created_at: string;
+}
+
+export interface LookbookItem {
+    id: number;
+    itemable_type: string;
+    itemable_id: number;
+    note: string | null;
+    sort_order: number;
+    item: TryOnResult | OutfitSuggestion;
+}
+
+export interface ShareLink {
+    id: number;
+    token: string;
+    url: string;
+    shareable_type: string;
+    expires_at: string | null;
+    is_active: boolean;
+    view_count: number;
+    reactions_summary: Record<string, number>;
+}
+
+export interface OutfitTemplate {
+    id: number;
+    name: string;
+    occasion: string;
+    description: string | null;
+    icon: string | null;
+    slots: TemplateSlot[];
+    is_system: boolean;
+}
+
+export interface TemplateSlot {
+    label: string;
+    category: 'upper' | 'lower' | 'dress';
+    required: boolean;
+}
+
+export interface Outfit {
+    id: number;
+    name: string;
+    occasion: string | null;
+    notes: string | null;
+    harmony_score: number | null;
+    template: OutfitTemplate | null;
+    garments: Garment[];
+    created_at: string;
+}
+
+export interface PackingList {
+    id: number;
+    name: string;
+    destination: string | null;
+    start_date: string | null;
+    end_date: string | null;
+    occasions: string[] | null;
+    notes: string | null;
+    items: PackingListItem[];
+    packed_count: number;
+    total_count: number;
+    created_at: string;
+}
+
+export interface PackingListItem {
+    id: number;
+    garment: Garment;
+    day_number: number | null;
+    occasion: string | null;
+    is_packed: boolean;
+}
+
+export interface ScrapedProduct {
+    name: string;
+    brand: string | null;
+    image_url: string;
+    category_hint: string | null;
+    material: string | null;
+    description: string | null;
+    source_url: string;
+    source_provider: string;
+}
+
+export interface ExportStatus {
+    id: number;
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    file_size_bytes: number | null;
+    download_url: string | null;
+    created_at: string;
 }

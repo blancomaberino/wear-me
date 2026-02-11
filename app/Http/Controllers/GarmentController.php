@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\GarmentCategory;
+use App\Http\Requests\BulkStoreGarmentRequest;
 use App\Http\Requests\StoreGarmentRequest;
 use App\Http\Requests\UpdateGarmentRequest;
 use App\Http\Resources\GarmentResource;
+use App\Jobs\ProcessBulkGarment;
 use App\Models\Garment;
 use App\Services\WardrobeService;
 use Illuminate\Http\Request;
@@ -52,6 +54,32 @@ class GarmentController extends Controller
         );
 
         return redirect()->back()->with('success', __('messages.garment_uploaded'));
+    }
+
+    public function bulkStore(BulkStoreGarmentRequest $request)
+    {
+        $user = $request->user();
+        $currentCount = $user->garments()->count();
+        $files = $request->file('images');
+        $maxAllowed = 200 - $currentCount;
+
+        if ($maxAllowed <= 0) {
+            return redirect()->back()->withErrors(['images' => 'Maximum of 200 garments allowed.']);
+        }
+
+        $filesToProcess = array_slice($files, 0, $maxAllowed);
+
+        foreach ($filesToProcess as $file) {
+            $tempPath = $file->store('temp/bulk-uploads', 'local');
+            ProcessBulkGarment::dispatch(
+                $user,
+                $tempPath,
+                $file->getClientOriginalName(),
+                $request->input('category')
+            );
+        }
+
+        return redirect()->back()->with('success', __('messages.bulk_upload_started', ['count' => count($filesToProcess)]));
     }
 
     public function update(UpdateGarmentRequest $request, Garment $garment)

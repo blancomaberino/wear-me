@@ -14,6 +14,8 @@ export default {
   saved: 'Guardado',
   unsave: 'Quitar',
   close: 'Cerrar',
+  retry: 'Intentar de nuevo',
+  selected: 'seleccionados',
   cm: 'cm',
   kg: 'kg',
   stepOf: 'Paso {{current}} de {{total}}',
