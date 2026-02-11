@@ -1,0 +1,18 @@
+export default {
+  generateTitle: 'Generar Video',
+  emptyState: 'No hay pruebas completadas aun',
+  emptyStateHint: 'Completa una prueba primero para generar un video',
+  goToTryOn: 'Ir a Prueba',
+  selectPrompt: 'Selecciona un resultado para animar',
+  processing: 'Procesando...',
+  generateButton: 'Generar Video',
+  resultTitle: 'Resultado de Video',
+  garmentLabel: 'Prenda',
+  durationLabel: 'Duracion',
+  createdLabel: 'Creado',
+  historyTitle: 'Historial de Videos',
+  notice: 'Aviso',
+  unavailableNotice: 'La generacion de videos no esta disponible temporalmente. Los videos generados anteriormente siguen siendo accesibles a continuacion.',
+  emptyHistory: 'Aun no hay videos',
+  generateFirst: 'Genera tu primer video',
+};

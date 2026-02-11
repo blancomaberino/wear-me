@@ -1,0 +1,18 @@
+export default {
+  generateTitle: 'Generate Video',
+  emptyState: 'No completed try-ons yet',
+  emptyStateHint: 'Complete a try-on first to generate a video',
+  goToTryOn: 'Go to Try-On',
+  selectPrompt: 'Select a try-on result to animate',
+  processing: 'Processing...',
+  generateButton: 'Generate Video',
+  resultTitle: 'Video Result',
+  garmentLabel: 'Garment',
+  durationLabel: 'Duration',
+  createdLabel: 'Created',
+  historyTitle: 'Video History',
+  notice: 'Notice',
+  unavailableNotice: 'Video generation is temporarily unavailable. Previously generated videos are still accessible below.',
+  emptyHistory: 'No videos yet',
+  generateFirst: 'Generate your first video',
+};

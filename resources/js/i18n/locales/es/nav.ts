@@ -1,0 +1,16 @@
+export default {
+  dashboard: 'Inicio',
+  myPhotos: 'Mis Fotos',
+  wardrobe: 'Armario',
+  tryOn: 'Probar',
+  outfits: 'Outfits',
+  home: 'Inicio',
+  photos: 'Fotos',
+  more: 'Más',
+  history: 'Historial',
+  profile: 'Perfil',
+  logOut: 'Cerrar sesión',
+  brandName: 'WearMe',
+  skipToContent: 'Ir al contenido',
+  poweredByAi: 'Prueba virtual con inteligencia artificial',
+};

@@ -1,0 +1,16 @@
+export default {
+  dashboard: 'Dashboard',
+  myPhotos: 'My Photos',
+  wardrobe: 'Wardrobe',
+  tryOn: 'Try On',
+  outfits: 'Outfits',
+  home: 'Home',
+  photos: 'Photos',
+  more: 'More',
+  history: 'History',
+  profile: 'Profile',
+  logOut: 'Log Out',
+  brandName: 'WearMe',
+  skipToContent: 'Skip to content',
+  poweredByAi: 'Virtual try-on powered by AI',
+};

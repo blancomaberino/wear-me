@@ -1,0 +1,59 @@
+{
+  "name": "WearMe Laravel",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/var/www/html",
+  "shutdownAction": "stopCompose",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "php.validate.executablePath": "/usr/local/bin/php",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4
+      },
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "shufo.vscode-blade-formatter",
+        "onecentlin.laravel-blade",
+        "mikestead.dotenv",
+        "EditorConfig.EditorConfig",
+        "xdebug.php-debug",
+        "ryannaddy.laravel-artisan",
+        "amiralizadeh9480.laravel-extra-intellisense"
+      ]
+    }
+  },
+
+  "forwardPorts": [8000, 5173, 3306, 6379, 8025],
+  "portsAttributes": {
+    "8000": { "label": "Laravel", "onAutoForward": "notify" },
+    "5173": { "label": "Vite", "onAutoForward": "notify" },
+    "3306": { "label": "MySQL", "onAutoForward": "silent" },
+    "6379": { "label": "Redis", "onAutoForward": "silent" },
+    "8025": { "label": "Mailpit", "onAutoForward": "notify" }
+  },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "remoteUser": "www-data",
+
+  "remoteEnv": {
+    "APP_ENV": "local",
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": "mysql",
+    "DB_PORT": "3306",
+    "DB_DATABASE": "wearme",
+    "DB_USERNAME": "wearme",
+    "DB_PASSWORD": "secret",
+    "REDIS_HOST": "redis",
+    "REDIS_PORT": "6379",
+    "MAIL_MAILER": "smtp",
+    "MAIL_HOST": "mailpit",
+    "MAIL_PORT": "1025"
+  }
+}
