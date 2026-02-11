@@ -70,6 +70,10 @@ class GarmentController extends Controller
             'measurement_sleeve_cm' => 'nullable|numeric|min:0|max:300',
         ]);
 
+        if ($request->user()->garments()->count() >= 200) {
+            return redirect()->back()->withErrors(['image' => 'Maximum of 200 garments allowed.']);
+        }
+
         $data = $this->imageService->processAndStore(
             $request->file('image'),
             'garments'

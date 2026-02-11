@@ -58,6 +58,7 @@ class DashboardController extends Controller
             'recentTryOns' => $recentTryOns,
             'wardrobeStats' => $wardrobeStats,
             'modelImageCount' => $modelImageCount,
+            'videoCount' => $videoCount,
             'savedSuggestionCount' => $suggestionCount,
             'hasMeasurements' => $user->hasMeasurements(),
         ]);

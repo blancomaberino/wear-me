@@ -37,7 +37,7 @@ class TryOnVideoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tryon_result_id' => 'required|exists:tryon_results,id',
+            'tryon_result_id' => 'required|integer',
         ]);
 
         $tryOnResult = $request->user()->tryonResults()->findOrFail($request->tryon_result_id);

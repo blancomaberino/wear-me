@@ -114,7 +114,7 @@ class ProcessTryOnTest extends TestCase
 
         $tryOnResult->refresh();
         $this->assertEquals(ProcessingStatus::Failed, $tryOnResult->status);
-        $this->assertEquals('API connection failed', $tryOnResult->error_message);
+        $this->assertEquals('Try-on processing failed. Please try again.', $tryOnResult->error_message);
     }
 
     public function test_job_loads_multiple_garments_from_pivot(): void

@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PollKlingTask implements ShouldQueue
 {
@@ -52,9 +53,25 @@ class PollKlingTask implements ShouldQueue
             if ($this->attempts() >= $this->tries) {
                 $this->tryOnVideo->update([
                     'status' => ProcessingStatus::Failed,
-                    'error_message' => 'Polling timed out: ' . $e->getMessage(),
+                    'error_message' => 'Video processing timed out. Please try again.',
                 ]);
             }
+        }
+    }
+
+    private function validateExternalUrl(string $url): void
+    {
+        $parsed = parse_url($url);
+        $scheme = $parsed['scheme'] ?? '';
+        $host = $parsed['host'] ?? '';
+
+        if ($scheme !== 'https') {
+            throw new \RuntimeException('Only HTTPS URLs are allowed for downloads');
+        }
+
+        $ip = gethostbyname($host);
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            throw new \RuntimeException('URL resolves to a private or reserved IP address');
         }
     }
 
@@ -64,8 +81,9 @@ class PollKlingTask implements ShouldQueue
             $videoUrl = $result['videos'][0]['url'];
             $duration = $result['videos'][0]['duration'] ?? null;
 
+            $this->validateExternalUrl($videoUrl);
             $response = Http::timeout(60)->get($videoUrl);
-            $filename = uniqid() . '.mp4';
+            $filename = Str::random(20) . '.mp4';
             $path = 'tryon-videos/' . $filename;
 
             Storage::disk('public')->put($path, $response->body());

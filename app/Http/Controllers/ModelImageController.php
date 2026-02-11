@@ -42,6 +42,10 @@ class ModelImageController extends Controller
             'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
         ]);
 
+        if ($request->user()->modelImages()->count() >= 50) {
+            return redirect()->back()->withErrors(['image' => 'Maximum of 50 photos allowed.']);
+        }
+
         $data = $this->imageService->processAndStore(
             $request->file('image'),
             'model-images'
