@@ -80,7 +80,7 @@ export default function Index({ garments, currentCategory }: Props) {
             )}
 
             <GarmentUploadDialog open={showUpload} onClose={() => setShowUpload(false)} />
-            <GarmentDetailSheet garment={selectedGarment} open={!!selectedGarment} onClose={() => setSelectedGarment(null)} />
+            <GarmentDetailSheet key={selectedGarment?.id} garment={selectedGarment} open={!!selectedGarment} onClose={() => setSelectedGarment(null)} />
         </AuthenticatedLayout>
     );
 }

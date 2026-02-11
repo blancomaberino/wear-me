@@ -83,4 +83,19 @@ class Garment extends Model
         }
         return '';
     }
+
+    public function scopeByCategory($query, string $category)
+    {
+        return $query->where('category', $category);
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Garment $garment) {
+            Storage::disk('public')->delete($garment->path);
+            if ($garment->thumbnail_path) {
+                Storage::disk('public')->delete($garment->thumbnail_path);
+            }
+        });
+    }
 }

@@ -53,4 +53,14 @@ class ModelImage extends Model
     {
         return $this->thumbnail_path ? Storage::disk('public')->url($this->thumbnail_path) : null;
     }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (ModelImage $modelImage) {
+            Storage::disk('public')->delete($modelImage->path);
+            if ($modelImage->thumbnail_path) {
+                Storage::disk('public')->delete($modelImage->thumbnail_path);
+            }
+        });
+    }
 }

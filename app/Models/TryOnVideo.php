@@ -57,4 +57,9 @@ class TryOnVideo extends Model
     {
         return $this->video_path ? Storage::disk('public')->url($this->video_path) : null;
     }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', ProcessingStatus::Completed);
+    }
 }
