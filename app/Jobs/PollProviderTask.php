@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PollProviderTask implements ShouldQueue
 {
@@ -51,9 +52,25 @@ class PollProviderTask implements ShouldQueue
             if ($this->attempts() >= $this->tries) {
                 $this->tryOnResult->update([
                     'status' => ProcessingStatus::Failed,
-                    'error_message' => 'Polling timed out: ' . $e->getMessage(),
+                    'error_message' => 'Processing timed out. Please try again.',
                 ]);
             }
+        }
+    }
+
+    private function validateExternalUrl(string $url): void
+    {
+        $parsed = parse_url($url);
+        $scheme = $parsed['scheme'] ?? '';
+        $host = $parsed['host'] ?? '';
+
+        if ($scheme !== 'https') {
+            throw new \RuntimeException('Only HTTPS URLs are allowed for downloads');
+        }
+
+        $ip = gethostbyname($host);
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            throw new \RuntimeException('URL resolves to a private or reserved IP address');
         }
     }
 
@@ -68,8 +85,9 @@ class PollProviderTask implements ShouldQueue
         }
 
         $imageUrl = $images[0]['url'];
+        $this->validateExternalUrl($imageUrl);
         $response = Http::timeout(60)->get($imageUrl);
-        $filename = uniqid() . '.jpg';
+        $filename = Str::random(20) . '.jpg';
         $path = 'tryon-results/' . $filename;
 
         Storage::disk('public')->put($path, $response->body());

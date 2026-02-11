@@ -8,6 +8,7 @@ use App\Contracts\TryOnSubmission;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class GeminiTryOnProvider implements TryOnProviderContract
 {
@@ -64,29 +65,28 @@ class GeminiTryOnProvider implements TryOnProviderContract
                 : $this->buildMultiGarmentParts($modelImageBase64, $garments, $promptHint);
         }
 
-        $response = Http::timeout(120)->post($endpoint . '?key=' . $apiKey, [
-            'contents' => [
-                [
-                    'parts' => $parts,
+        $response = Http::timeout(120)
+            ->withHeaders(['x-goog-api-key' => $apiKey])
+            ->post($endpoint, [
+                'contents' => [
+                    [
+                        'parts' => $parts,
+                    ],
                 ],
-            ],
-            'generationConfig' => [
-                'responseModalities' => ['Text', 'Image'],
-            ],
-        ]);
+                'generationConfig' => [
+                    'responseModalities' => ['Text', 'Image'],
+                ],
+            ]);
 
         if (!$response->successful()) {
-            Log::error('Gemini try-on request failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-            throw new \RuntimeException('Gemini API request failed: ' . $response->body());
+            Log::error('Gemini API request failed', ['status' => $response->status(), 'body' => $response->body()]);
+            throw new \RuntimeException('Virtual try-on processing failed. Please try again.');
         }
 
         $data = $response->json();
         $imageData = $this->extractImageFromResponse($data);
 
-        $filename = uniqid() . '.jpg';
+        $filename = Str::random(20) . '.jpg';
         $path = 'tryon-results/' . $filename;
         Storage::disk('public')->put($path, base64_decode($imageData));
 

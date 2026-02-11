@@ -41,7 +41,7 @@ class ImageProcessingService
         $image = $this->manager->read($file->getPathname());
         $image->cover(300, 300);
 
-        $thumbnailName = 'thumb_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $thumbnailName = 'thumb_' . \Illuminate\Support\Str::random(20) . '.jpg';
         $thumbnailPath = $directory . '/thumbnails/' . $thumbnailName;
 
         Storage::disk('public')->put($thumbnailPath, $image->toJpeg(80));

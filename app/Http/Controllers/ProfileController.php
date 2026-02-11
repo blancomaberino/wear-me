@@ -87,7 +87,7 @@ class ProfileController extends Controller
     public function detectPalette(Request $request, ColorPaletteService $colorPaletteService): JsonResponse
     {
         $request->validate([
-            'model_image_id' => 'required|exists:model_images,id',
+            'model_image_id' => 'required|integer',
             'color_count' => 'sometimes|integer|min:1|max:50',
         ]);
 

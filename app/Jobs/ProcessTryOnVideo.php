@@ -41,10 +41,10 @@ class ProcessTryOnVideo implements ShouldQueue
                 ->delay(now()->addSeconds(15));
 
         } catch (\Throwable $e) {
-            Log::error('ProcessTryOnVideo failed', ['error' => $e->getMessage()]);
+            Log::error('ProcessTryOnVideo failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             $this->tryOnVideo->update([
                 'status' => ProcessingStatus::Failed,
-                'error_message' => $e->getMessage(),
+                'error_message' => 'Video processing failed. Please try again.',
             ]);
         }
     }

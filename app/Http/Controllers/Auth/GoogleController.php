@@ -19,27 +19,31 @@ class GoogleController extends Controller
     {
         $googleUser = Socialite::driver('google')->user();
 
-        $user = User::where('google_id', $googleUser->getId())
-            ->orWhere('email', $googleUser->getEmail())
-            ->first();
+        $user = User::where('google_id', $googleUser->getId())->first();
+
+        if (!$user) {
+            $user = User::where('email', $googleUser->getEmail())
+                ->whereNull('google_id')
+                ->first();
+        }
 
         if ($user) {
-            $user->update([
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
-            ]);
+            $user->google_id = $googleUser->getId();
+            $user->avatar = $googleUser->getAvatar();
+            $user->save();
         } else {
             $user = User::create([
                 'name' => $googleUser->getName(),
                 'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
                 'password' => bcrypt(Str::random(24)),
                 'email_verified_at' => now(),
             ]);
+            $user->google_id = $googleUser->getId();
+            $user->avatar = $googleUser->getAvatar();
+            $user->save();
         }
 
-        Auth::login($user, true);
+        Auth::login($user);
 
         return redirect()->intended(route('dashboard'));
     }

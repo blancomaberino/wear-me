@@ -62,10 +62,10 @@ class TryOnController extends Controller
         }
 
         $request->validate([
-            'model_image_id' => 'required_without:source_tryon_result_id|nullable|exists:model_images,id',
-            'source_tryon_result_id' => 'nullable|exists:tryon_results,id',
+            'model_image_id' => 'required_without:source_tryon_result_id|nullable|integer',
+            'source_tryon_result_id' => 'nullable|integer',
             'garment_ids' => 'required|array|min:1|max:5',
-            'garment_ids.*' => 'required|exists:garments,id',
+            'garment_ids.*' => 'required|integer',
             'prompt_hint' => 'nullable|string|max:200',
         ]);
 

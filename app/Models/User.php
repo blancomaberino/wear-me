@@ -16,8 +16,6 @@ class User extends Authenticatable
         'email',
         'locale',
         'password',
-        'google_id',
-        'avatar',
         'color_palette',
         'measurement_unit',
         'height_cm',
