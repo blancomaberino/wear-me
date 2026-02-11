@@ -14,7 +14,6 @@ class TryOnVideo extends Model
     protected $table = 'tryon_videos';
 
     protected $fillable = [
-        'user_id',
         'tryon_result_id',
         'model_image_id',
         'garment_id',
@@ -56,5 +55,10 @@ class TryOnVideo extends Model
     public function getVideoUrlAttribute(): ?string
     {
         return $this->video_path ? Storage::disk('public')->url($this->video_path) : null;
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', ProcessingStatus::Completed);
     }
 }

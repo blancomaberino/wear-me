@@ -2,65 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreModelImageRequest;
+use App\Http\Resources\ModelImageResource;
 use App\Models\ModelImage;
-use App\Services\ImageProcessingService;
+use App\Services\WardrobeService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ModelImageController extends Controller
 {
     public function __construct(
-        private ImageProcessingService $imageService
+        private WardrobeService $wardrobeService
     ) {}
 
     public function index(Request $request)
     {
-        $images = $request->user()
-            ->modelImages()
-            ->latest()
-            ->get()
-            ->map(fn (ModelImage $image) => [
-                'id' => $image->id,
-                'url' => $image->url,
-                'thumbnail_url' => $image->thumbnail_url,
-                'original_filename' => $image->original_filename,
-                'is_primary' => $image->is_primary,
-                'width' => $image->width,
-                'height' => $image->height,
-                'created_at' => $image->created_at->diffForHumans(),
-            ]);
-
         return Inertia::render('ModelImages/Index', [
-            'images' => $images,
+            'images' => ModelImageResource::collection(
+                $request->user()->modelImages()->latest()->get()
+            ),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreModelImageRequest $request)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
-        ]);
-
         if ($request->user()->modelImages()->count() >= 50) {
             return redirect()->back()->withErrors(['image' => 'Maximum of 50 photos allowed.']);
         }
 
-        $data = $this->imageService->processAndStore(
-            $request->file('image'),
-            'model-images'
-        );
-
-        $request->user()->modelImages()->create($data);
+        $this->wardrobeService->storeModelImage($request->user(), $request->file('image'));
 
         return redirect()->back()->with('success', __('messages.photo_uploaded'));
     }
 
     public function setPrimary(Request $request, ModelImage $modelImage)
     {
-        if ($modelImage->user_id !== $request->user()->id) {
-            abort(403);
-        }
+        $this->authorize('update', $modelImage);
 
         $request->user()->modelImages()->update(['is_primary' => false]);
         $modelImage->update(['is_primary' => true]);
@@ -70,16 +47,9 @@ class ModelImageController extends Controller
 
     public function destroy(Request $request, ModelImage $modelImage)
     {
-        if ($modelImage->user_id !== $request->user()->id) {
-            abort(403);
-        }
+        $this->authorize('delete', $modelImage);
 
-        Storage::disk('public')->delete($modelImage->path);
-        if ($modelImage->thumbnail_path) {
-            Storage::disk('public')->delete($modelImage->thumbnail_path);
-        }
-
-        $modelImage->delete();
+        $this->wardrobeService->deleteModelImage($modelImage);
 
         return redirect()->back()->with('success', __('messages.photo_deleted'));
     }

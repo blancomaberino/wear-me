@@ -16,7 +16,6 @@ class Garment extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
         'path',
         'original_filename',
         'thumbnail_path',
@@ -82,5 +81,20 @@ class Garment extends Model
             return $this->brand ? "{$this->brand} {$this->size_label}" : $this->size_label;
         }
         return '';
+    }
+
+    public function scopeByCategory($query, string $category)
+    {
+        return $query->where('category', $category);
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Garment $garment) {
+            Storage::disk('public')->delete($garment->path);
+            if ($garment->thumbnail_path) {
+                Storage::disk('public')->delete($garment->thumbnail_path);
+            }
+        });
     }
 }

@@ -14,7 +14,6 @@ class ModelImage extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
         'path',
         'original_filename',
         'thumbnail_path',
@@ -52,5 +51,15 @@ class ModelImage extends Model
     public function getThumbnailUrlAttribute(): ?string
     {
         return $this->thumbnail_path ? Storage::disk('public')->url($this->thumbnail_path) : null;
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (ModelImage $modelImage) {
+            Storage::disk('public')->delete($modelImage->path);
+            if ($modelImage->thumbnail_path) {
+                Storage::disk('public')->delete($modelImage->thumbnail_path);
+            }
+        });
     }
 }

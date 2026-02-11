@@ -16,7 +16,6 @@ class TryOnResult extends Model
     protected $table = 'tryon_results';
 
     protected $fillable = [
-        'user_id',
         'model_image_id',
         'source_tryon_result_id',
         'garment_id',
@@ -73,5 +72,15 @@ class TryOnResult extends Model
     public function getResultUrlAttribute(): ?string
     {
         return $this->result_path ? Storage::disk('public')->url($this->result_path) : null;
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', ProcessingStatus::Completed);
+    }
+
+    public function scopeForUser($query, User $user)
+    {
+        return $query->where('user_id', $user->id);
     }
 }

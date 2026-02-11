@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\TryOnResult;
 use App\Enums\ProcessingStatus;
 use App\Contracts\TryOnProviderContract;
+use App\Services\TryOnService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -37,10 +38,8 @@ class ProcessTryOn implements ShouldQueue
             }
 
             // Load garments from pivot table, fallback to legacy garment_id
-            $garments = $this->tryOnResult->garments()->orderByPivot('sort_order')->get();
-            if ($garments->isEmpty() && $this->tryOnResult->garment_id) {
-                $garments = collect([$this->tryOnResult->garment]);
-            }
+            $tryOnService = app(TryOnService::class);
+            $garments = $tryOnService->resolveGarments($this->tryOnResult);
 
             $garmentData = $garments->map(fn ($g) => [
                 'path' => $g->path,
