@@ -44,7 +44,7 @@ class SpanishTranslationTest extends TestCase
     public function test_all_spanish_locale_files_exist(): void
     {
         $localeDir = resource_path('js/i18n/locales/es');
-        $expectedFiles = ['common.ts', 'wardrobe.ts', 'tryon.ts', 'outfits.ts', 'lookbooks.ts', 'share.ts', 'processing.ts'];
+        $expectedFiles = ['common.ts', 'wardrobe.ts', 'tryon.ts', 'outfits.ts', 'lookbooks.ts', 'share.ts', 'processing.ts', 'packing.ts', 'export.ts', 'nav.ts'];
 
         foreach ($expectedFiles as $file) {
             $this->assertFileExists("{$localeDir}/{$file}", "Missing Spanish locale file: {$file}");

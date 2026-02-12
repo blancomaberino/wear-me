@@ -259,6 +259,9 @@ class LookbookTest extends TestCase
             ->get(route('lookbooks.show', $lookbook))
             ->assertInertia(fn ($page) => $page
                 ->has('lookbook.items', 3)
+                ->where('lookbook.items.0.id', $item2->id)   // sort_order 0
+                ->where('lookbook.items.1.id', $item3->id)   // sort_order 1
+                ->where('lookbook.items.2.id', $item1->id)   // sort_order 2
             );
     }
 

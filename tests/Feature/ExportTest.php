@@ -178,7 +178,17 @@ class ExportTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_export_job_marks_failed_on_last_attempt(): void
+    public function test_export_job_has_retry_configuration(): void
+    {
+        $user = User::factory()->create();
+        $export = Export::factory()->for($user)->create(['status' => 'pending']);
+
+        $job = new GenerateExport($export);
+
+        $this->assertEquals(2, $job->tries);
+    }
+
+    public function test_export_job_sets_status_to_completed_on_success(): void
     {
         Storage::fake('local');
         Storage::fake('public');
@@ -186,15 +196,13 @@ class ExportTest extends TestCase
         $user = User::factory()->create();
         $export = Export::factory()->for($user)->create(['status' => 'pending']);
 
-        // The job will fail because there are no garments/files to zip
-        // We test that on exception, status updates appropriately
         $job = new GenerateExport($export);
+        $job->handle();
 
-        // Simulate being on the last attempt
-        $reflection = new \ReflectionMethod($job, 'attempts');
-        // We can't easily mock attempts(), so test the export status handling directly
-        // Instead, verify the export has retry configuration
-        $this->assertEquals(2, $job->tries);
+        $export->refresh();
+        $this->assertEquals('completed', $export->status);
+        $this->assertNotNull($export->file_path);
+        $this->assertNotNull($export->file_size_bytes);
     }
 
     public function test_export_job_timeout_is_configured(): void

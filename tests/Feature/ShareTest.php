@@ -145,7 +145,8 @@ class ShareTest extends TestCase
             ->postJson(route('share.store'), [
                 'shareable_type' => 'lookbook',
                 'shareable_id' => $lookbook->id,
-            ]);
+            ])
+            ->assertOk();
 
         $link = ShareLink::where('user_id', $user->id)->first();
         $this->assertNotNull($link);
