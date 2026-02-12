@@ -19,6 +19,7 @@ class UpdateGarmentRequest extends FormRequest
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'category' => ['nullable', Rule::enum(GarmentCategory::class)],
+            'clothing_type' => 'nullable|string|max:50',
             'size_label' => 'nullable|string|max:20',
             'brand' => 'nullable|string|max:100',
             'material' => 'nullable|string|max:100',

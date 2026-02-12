@@ -194,4 +194,16 @@ class OutfitSuggestionTest extends TestCase
                 ->where('garmentCount', 7)
             );
     }
+
+    public function test_suggestions_index_is_limited_to_50(): void
+    {
+        $user = User::factory()->create();
+        OutfitSuggestion::factory(60)->for($user)->create();
+
+        $this->actingAs($user)
+            ->get(route('outfits.index'))
+            ->assertInertia(fn ($page) => $page
+                ->has('suggestions', 50)
+            );
+    }
 }

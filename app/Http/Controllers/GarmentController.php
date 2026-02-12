@@ -46,7 +46,7 @@ class GarmentController extends Controller
         $this->wardrobeService->storeGarment(
             $request->user(),
             $request->only([
-                'category', 'name', 'description', 'size_label', 'brand', 'material',
+                'category', 'name', 'description', 'clothing_type', 'size_label', 'brand', 'material',
                 'measurement_chest_cm', 'measurement_length_cm', 'measurement_waist_cm',
                 'measurement_inseam_cm', 'measurement_shoulder_cm', 'measurement_sleeve_cm',
             ]),
@@ -87,7 +87,7 @@ class GarmentController extends Controller
         $this->authorize('update', $garment);
 
         $garment->update($request->only([
-            'name', 'description', 'category', 'size_label', 'brand', 'material',
+            'name', 'description', 'category', 'clothing_type', 'size_label', 'brand', 'material',
             'measurement_chest_cm', 'measurement_length_cm', 'measurement_waist_cm',
             'measurement_inseam_cm', 'measurement_shoulder_cm', 'measurement_sleeve_cm',
         ]));

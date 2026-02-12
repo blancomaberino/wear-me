@@ -321,4 +321,75 @@ class LookbookTest extends TestCase
             ->get(route('lookbooks.index'))
             ->assertInertia(fn ($page) => $page->has('lookbooks', 2));
     }
+
+    public function test_lookbook_update_can_toggle_is_public(): void
+    {
+        $user = User::factory()->create();
+        $lookbook = Lookbook::factory()->for($user)->create([
+            'is_public' => false,
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('lookbooks.update', $lookbook), [
+                'name' => $lookbook->name,
+                'is_public' => true,
+            ])
+            ->assertRedirect();
+
+        $this->assertTrue($lookbook->fresh()->is_public);
+    }
+
+    public function test_lookbook_update_can_set_cover_from_item(): void
+    {
+        $user = User::factory()->create();
+        $lookbook = Lookbook::factory()->for($user)->create();
+        $tryOnResult = TryOnResult::factory()->for($user)->create([
+            'result_path' => 'results/test-cover.jpg',
+        ]);
+        $item = LookbookItem::factory()->for($lookbook)->create([
+            'itemable_type' => TryOnResult::class,
+            'itemable_id' => $tryOnResult->id,
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('lookbooks.update', $lookbook), [
+                'name' => $lookbook->name,
+                'cover_item_id' => $item->id,
+            ])
+            ->assertRedirect();
+
+        $lookbook->refresh();
+        $this->assertEquals('results/test-cover.jpg', $lookbook->cover_image_path);
+    }
+
+    public function test_lookbook_update_rejects_item_from_other_lookbook(): void
+    {
+        $user = User::factory()->create();
+        $lookbook = Lookbook::factory()->for($user)->create();
+        $otherLookbook = Lookbook::factory()->for($user)->create();
+        $item = LookbookItem::factory()->for($otherLookbook)->create();
+
+        $this->actingAs($user)
+            ->patch(route('lookbooks.update', $lookbook), [
+                'name' => $lookbook->name,
+                'cover_item_id' => $item->id,
+            ])
+            ->assertRedirect();
+
+        // Cover should NOT be set since item doesn't belong to this lookbook
+        $this->assertNull($lookbook->fresh()->cover_image_path);
+    }
+
+    public function test_user_cannot_update_other_users_lookbook(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $lookbook = Lookbook::factory()->for($otherUser)->create();
+
+        $this->actingAs($user)
+            ->patch(route('lookbooks.update', $lookbook), [
+                'name' => 'Hacked',
+            ])
+            ->assertForbidden();
+    }
 }

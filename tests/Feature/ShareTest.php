@@ -280,4 +280,61 @@ class ShareTest extends TestCase
 
         $this->assertTrue($shareLink->fresh()->is_active);
     }
+
+    public function test_share_link_token_is_auto_generated_not_mass_assignable(): void
+    {
+        $user = User::factory()->create();
+        $lookbook = Lookbook::factory()->for($user)->create();
+
+        // Create a link - token should be auto-generated even without providing one
+        $link = $user->shareLinks()->create([
+            'shareable_type' => Lookbook::class,
+            'shareable_id' => $lookbook->id,
+        ]);
+
+        $this->assertNotNull($link->token);
+        $this->assertGreaterThanOrEqual(32, strlen($link->token));
+    }
+
+    public function test_view_count_not_incremented_on_reaction(): void
+    {
+        $user = User::factory()->create();
+        $lookbook = Lookbook::factory()->for($user)->create();
+        $shareLink = ShareLink::factory()->for($user)->create([
+            'shareable_type' => Lookbook::class,
+            'shareable_id' => $lookbook->id,
+            'is_active' => true,
+            'view_count' => 5,
+        ]);
+
+        $this->postJson(route('share.react', $shareLink->token), [
+            'type' => 'heart',
+        ])->assertOk();
+
+        // View count should NOT have increased (reaction should not inflate views)
+        $this->assertEquals(5, $shareLink->fresh()->view_count);
+    }
+
+    public function test_reactions_summary_uses_loaded_relation(): void
+    {
+        $user = User::factory()->create();
+        $lookbook = Lookbook::factory()->for($user)->create();
+        $shareLink = ShareLink::factory()->for($user)->create([
+            'shareable_type' => Lookbook::class,
+            'shareable_id' => $lookbook->id,
+            'is_active' => true,
+        ]);
+
+        // Add some reactions
+        $shareLink->reactions()->create(['type' => 'heart', 'visitor_hash' => 'hash1']);
+        $shareLink->reactions()->create(['type' => 'heart', 'visitor_hash' => 'hash2']);
+        $shareLink->reactions()->create(['type' => 'fire', 'visitor_hash' => 'hash3']);
+
+        // Load reactions eagerly
+        $shareLink->load('reactions');
+
+        $summary = $shareLink->reactions_summary;
+        $this->assertEquals(2, $summary['heart']);
+        $this->assertEquals(1, $summary['fire']);
+    }
 }
