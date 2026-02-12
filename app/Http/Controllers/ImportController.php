@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ScrapeUrlRequest;
+use App\Models\User;
 use App\Services\Scraper\ScraperService;
 use App\Services\Scraper\UrlValidator;
 use App\Services\WardrobeService;
@@ -49,7 +50,7 @@ class ImportController extends Controller
 
         $user = $request->user();
 
-        if ($user->garments()->count() >= 200) {
+        if ($user->garments()->count() >= User::MAX_GARMENTS) {
             return redirect()->back()->withErrors(['url' => __('messages.garmentLimitReached')]);
         }
 

@@ -35,10 +35,10 @@ class SpanishTranslationTest extends TestCase
         $this->assertStringContainsString('día', $content, 'Missing accent on día in es/share.ts');
 
         // Should NOT have 'dia' without accent (except as part of 'día')
-        // Check that all occurrences of 'dia' are actually 'día'
-        $this->assertStringNotContainsString("'1 dia'", $content, 'Found unaccented dia in es/share.ts');
-        $this->assertStringNotContainsString("'7 dias'", $content, 'Found unaccented dias in es/share.ts');
-        $this->assertStringNotContainsString("'30 dias'", $content, 'Found unaccented dias in es/share.ts');
+        // Use regex to match regardless of quote style (single, double, or backtick)
+        $this->assertDoesNotMatchRegularExpression('/[\'"`]1 dia[\'"`]/', $content, 'Found unaccented dia in es/share.ts');
+        $this->assertDoesNotMatchRegularExpression('/[\'"`]7 dias[\'"`]/', $content, 'Found unaccented dias in es/share.ts');
+        $this->assertDoesNotMatchRegularExpression('/[\'"`]30 dias[\'"`]/', $content, 'Found unaccented dias in es/share.ts');
     }
 
     public function test_all_spanish_locale_files_exist(): void

@@ -11,6 +11,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    public const MAX_GARMENTS = 200;
+
     protected $fillable = [
         'name',
         'email',

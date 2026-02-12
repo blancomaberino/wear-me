@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateGarmentRequest;
 use App\Http\Resources\GarmentResource;
 use App\Jobs\ProcessBulkGarment;
 use App\Models\Garment;
+use App\Models\User;
 use App\Services\WardrobeService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -39,8 +40,8 @@ class GarmentController extends Controller
 
     public function store(StoreGarmentRequest $request)
     {
-        if ($request->user()->garments()->count() >= 200) {
-            return redirect()->back()->withErrors(['image' => 'Maximum of 200 garments allowed.']);
+        if ($request->user()->garments()->count() >= User::MAX_GARMENTS) {
+            return redirect()->back()->withErrors(['image' => __('messages.garmentLimitReached')]);
         }
 
         $this->wardrobeService->storeGarment(
@@ -61,10 +62,10 @@ class GarmentController extends Controller
         $user = $request->user();
         $currentCount = $user->garments()->count();
         $files = $request->file('images');
-        $maxAllowed = 200 - $currentCount;
+        $maxAllowed = User::MAX_GARMENTS - $currentCount;
 
         if ($maxAllowed <= 0) {
-            return redirect()->back()->withErrors(['images' => 'Maximum of 200 garments allowed.']);
+            return redirect()->back()->withErrors(['images' => __('messages.garmentLimitReached')]);
         }
 
         $filesToProcess = array_slice($files, 0, $maxAllowed);

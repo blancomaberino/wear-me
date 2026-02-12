@@ -23,7 +23,7 @@ class ShareTest extends TestCase
         $user = User::factory()->create();
         $lookbook = Lookbook::factory()->for($user)->create();
 
-        $response = $this->actingAs($user)
+        $this->actingAs($user)
             ->postJson(route('share.store'), [
                 'shareable_type' => 'lookbook',
                 'shareable_id' => $lookbook->id,
@@ -157,7 +157,8 @@ class ShareTest extends TestCase
             ->postJson(route('share.store'), [
                 'shareable_type' => 'lookbook',
                 'shareable_id' => $lookbook->id,
-            ]);
+            ])
+            ->assertOk();
 
         $links = ShareLink::where('user_id', $user->id)->get();
         $tokens = $links->pluck('token')->toArray();

@@ -18,6 +18,7 @@ class ProcessBulkGarment implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 1;
+    public int $timeout = 120;
 
     public function __construct(
         private User $user,
@@ -37,7 +38,7 @@ class ProcessBulkGarment implements ShouldQueue
 
         try {
             // Re-check garment limit to prevent TOCTOU race from concurrent uploads
-            if ($this->user->garments()->count() >= 200) {
+            if ($this->user->garments()->count() >= User::MAX_GARMENTS) {
                 Log::info('ProcessBulkGarment: garment limit reached', ['user_id' => $this->user->id]);
                 return;
             }

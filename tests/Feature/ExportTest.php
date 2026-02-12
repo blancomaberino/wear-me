@@ -25,7 +25,7 @@ class ExportTest extends TestCase
 
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)
+        $this->actingAs($user)
             ->postJson(route('export.store'), [
                 'include_images' => true,
                 'include_results' => true,
