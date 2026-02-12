@@ -77,7 +77,11 @@ export default function MyOutfits({ outfits }: Props) {
 
                                 <div className="flex gap-2 mb-3">
                                     {outfit.garments?.map((g) => (
-                                        <img key={g.id} src={g.thumbnail_url || ''} alt={g.name || ''} className="h-14 w-14 rounded-lg object-cover bg-surface-50" loading="lazy" />
+                                        g.thumbnail_url ? (
+                                            <img key={g.id} src={g.thumbnail_url} alt={g.name || ''} className="h-14 w-14 rounded-lg object-cover bg-surface-50" loading="lazy" />
+                                        ) : (
+                                            <div key={g.id} className="h-14 w-14 rounded-lg bg-surface-100" />
+                                        )
                                     ))}
                                 </div>
 

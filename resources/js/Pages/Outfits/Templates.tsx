@@ -39,7 +39,7 @@ export default function Templates({ templates }: Props) {
             </div>
 
             {templates.length === 0 ? (
-                <EmptyState icon={Layout} title={t('outfits.templatesTitle')} description={t('outfits.templatesDesc')} />
+                <EmptyState icon={Layout} title={t('outfits.noTemplates')} description={t('outfits.noTemplatesDesc')} />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {templates.map((template) => (

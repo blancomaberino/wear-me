@@ -64,9 +64,39 @@ export default function GarmentUploadDialog({ open, onClose }: Props) {
         if (cameraInputRef.current) cameraInputRef.current.value = '';
     };
 
+    const clothingTypes: Record<string, { value: string; label: string }[]> = {
+        upper: [
+            { value: 't-shirt', label: t('wardrobe.typeShirt') },
+            { value: 'blouse', label: t('wardrobe.typeBlouse') },
+            { value: 'sweater', label: t('wardrobe.typeSweater') },
+            { value: 'jacket', label: t('wardrobe.typeJacket') },
+            { value: 'hoodie', label: t('wardrobe.typeHoodie') },
+            { value: 'tank-top', label: t('wardrobe.typeTankTop') },
+            { value: 'other', label: t('wardrobe.typeOther') },
+        ],
+        lower: [
+            { value: 'jeans', label: t('wardrobe.typeJeans') },
+            { value: 'pants', label: t('wardrobe.typePants') },
+            { value: 'shorts', label: t('wardrobe.typeShorts') },
+            { value: 'skirt', label: t('wardrobe.typeSkirt') },
+            { value: 'leggings', label: t('wardrobe.typeLeggings') },
+            { value: 'other', label: t('wardrobe.typeOther') },
+        ],
+        dress: [
+            { value: 'casual-dress', label: t('wardrobe.typeCasualDress') },
+            { value: 'formal-dress', label: t('wardrobe.typeFormalDress') },
+            { value: 'sundress', label: t('wardrobe.typeSundress') },
+            { value: 'jumpsuit', label: t('wardrobe.typeJumpsuit') },
+            { value: 'other', label: t('wardrobe.typeOther') },
+        ],
+    };
+
+    const [customType, setCustomType] = useState('');
+
     const { data, setData, post, processing, errors, reset } = useForm<{
         image: File | null;
         category: string;
+        clothing_type: string;
         name: string;
         brand: string;
         material: string;
@@ -80,6 +110,7 @@ export default function GarmentUploadDialog({ open, onClose }: Props) {
     }>({
         image: null,
         category: 'upper',
+        clothing_type: '',
         name: '',
         brand: '',
         material: '',
@@ -101,7 +132,7 @@ export default function GarmentUploadDialog({ open, onClose }: Props) {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] },
+        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.avif'] },
         maxFiles: 1,
         maxSize: 10 * 1024 * 1024,
     });
@@ -123,6 +154,7 @@ export default function GarmentUploadDialog({ open, onClose }: Props) {
         reset();
         setPreview(null);
         setShowMeasurements(false);
+        setCustomType('');
         onClose();
     };
 
@@ -184,7 +216,7 @@ export default function GarmentUploadDialog({ open, onClose }: Props) {
                             <button
                                 key={cat.value}
                                 type="button"
-                                onClick={() => setData('category', cat.value)}
+                                onClick={() => { setData('category', cat.value); setData('clothing_type', ''); setCustomType(''); }}
                                 className={cn(
                                     'px-4 py-1.5 rounded-pill text-body-sm font-medium transition-colors',
                                     data.category === cat.value
@@ -196,6 +228,33 @@ export default function GarmentUploadDialog({ open, onClose }: Props) {
                             </button>
                         ))}
                     </div>
+                </div>
+
+                {/* Clothing Type */}
+                <div>
+                    <label className="block text-body-sm font-medium text-surface-700 mb-2">{t('wardrobe.clothingType')}</label>
+                    <select
+                        value={data.clothing_type}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setData('clothing_type', val);
+                            if (val !== 'other') setCustomType('');
+                        }}
+                        className="w-full rounded-input border border-surface-300 px-3 py-2 text-body-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 bg-white"
+                    >
+                        <option value="">{t('wardrobe.selectType')}</option>
+                        {(clothingTypes[data.category] || []).map((ct) => (
+                            <option key={ct.value} value={ct.value}>{ct.label}</option>
+                        ))}
+                    </select>
+                    {data.clothing_type === 'other' && (
+                        <Input
+                            className="mt-2"
+                            value={customType}
+                            onChange={(e) => { setCustomType(e.target.value); setData('clothing_type', e.target.value || 'other'); }}
+                            placeholder={t('wardrobe.customTypePlaceholder')}
+                        />
+                    )}
                 </div>
 
                 {/* Basic Info */}

@@ -44,4 +44,6 @@ export default {
   outfitDetails: 'View and manage your outfit',
   templateLabel: 'Template',
   notesLabel: 'Notes',
+  noTemplates: 'No templates yet',
+  noTemplatesDesc: 'Outfit templates will appear here once created.',
 };

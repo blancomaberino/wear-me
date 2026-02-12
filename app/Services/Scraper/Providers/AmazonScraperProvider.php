@@ -12,7 +12,8 @@ class AmazonScraperProvider implements ScraperProviderContract
 {
     public function canHandle(string $url): bool
     {
-        return (bool) preg_match('/amazon\.(com|co\.uk|es|de|fr|it|ca|com\.au|co\.jp)/i', $url);
+        $host = parse_url($url, PHP_URL_HOST) ?? '';
+        return (bool) preg_match('/(?:^|\.)amazon\.(com|co\.uk|es|de|fr|it|ca|com\.au|co\.jp)$/i', $host);
     }
 
     public function scrape(string $url): ScrapedProduct

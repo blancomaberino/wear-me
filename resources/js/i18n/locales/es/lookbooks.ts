@@ -26,4 +26,7 @@ export default {
     addNote: 'Añadir una nota',
     reorder: 'Reordenar elementos',
     confirmDelete: 'Estas seguro de que quieres eliminar este lookbook?',
+    setCover: 'Usar como portada',
+    currentCover: 'Portada',
+    editDetails: 'Editar detalles',
 };

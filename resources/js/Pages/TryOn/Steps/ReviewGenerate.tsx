@@ -27,7 +27,7 @@ export default function ReviewGenerate({ selectedPhoto, sourceResult, selectedGa
                     <CardBody>
                         <p className="text-caption font-medium text-surface-500 mb-3">{t('tryon.yourPhoto')}</p>
                         {photoUrl && (
-                            <img src={photoUrl} alt="Selected photo" className="w-full h-48 object-cover rounded-lg" />
+                            <img src={photoUrl} alt="Selected photo" className="w-full max-h-64 object-contain rounded-lg bg-surface-50" />
                         )}
                         {sourceResult && <Badge variant="brand" className="mt-2">{t('tryon.usingPreviousResult')}</Badge>}
                     </CardBody>
@@ -68,6 +68,7 @@ export default function ReviewGenerate({ selectedPhoto, sourceResult, selectedGa
                     </CardBody>
                 </Card>
             )}
+
         </div>
     );
 }

@@ -12,6 +12,7 @@ import { useDropzone } from 'react-dropzone';
 import { Camera, Upload, Star, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import CameraDialog from '@/Components/CameraDialog';
 
 interface Props {
     images: ModelImage[];
@@ -21,7 +22,9 @@ export default function Index({ images }: Props) {
     const { t } = useTranslation();
     const [uploading, setUploading] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<ModelImage | null>(null);
+    const [showCamera, setShowCamera] = useState(false);
     const cameraInputRef = useRef<HTMLInputElement>(null);
+    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent);
 
     const handleCameraCapture = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -34,6 +37,16 @@ export default function Index({ images }: Props) {
             onFinish: () => setUploading(false),
         });
         if (cameraInputRef.current) cameraInputRef.current.value = '';
+    }, []);
+
+    const handleWebcamCapture = useCallback((file: File) => {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('image', file);
+        router.post(route('model-images.store'), formData as any, {
+            forceFormData: true,
+            onFinish: () => setUploading(false),
+        });
     }, []);
 
     const onDrop = useCallback((files: File[]) => {
@@ -49,7 +62,7 @@ export default function Index({ images }: Props) {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] },
+        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.avif'] },
         maxFiles: 1,
         maxSize: 10 * 1024 * 1024,
         disabled: uploading,
@@ -80,7 +93,7 @@ export default function Index({ images }: Props) {
                 ref={cameraInputRef}
                 type="file"
                 accept="image/*"
-                capture="user"
+                {...(isMobile ? { capture: 'user' } : {})}
                 onChange={handleCameraCapture}
                 className="hidden"
             />
@@ -114,7 +127,7 @@ export default function Index({ images }: Props) {
                 {!uploading && (
                     <button
                         type="button"
-                        onClick={() => cameraInputRef.current?.click()}
+                        onClick={() => isMobile ? cameraInputRef.current?.click() : setShowCamera(true)}
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-card border border-surface-200 bg-white text-surface-600 hover:bg-surface-50 hover:border-surface-300 transition-colors text-body-sm font-medium"
                     >
                         <Camera className="h-5 w-5" /> {t('photos.takePhoto')}
@@ -191,6 +204,12 @@ export default function Index({ images }: Props) {
                     <Button variant="danger" onClick={handleDelete}>{t('common.delete')}</Button>
                 </div>
             </Dialog>
+
+            <CameraDialog
+                open={showCamera}
+                onClose={() => setShowCamera(false)}
+                onCapture={handleWebcamCapture}
+            />
         </AuthenticatedLayout>
     );
 }

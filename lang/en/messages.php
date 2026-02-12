@@ -22,6 +22,7 @@ return [
     'lookbook_updated' => 'Lookbook updated successfully.',
     'lookbook_deleted' => 'Lookbook deleted successfully.',
     'item_added' => 'Item added successfully.',
+    'item_already_in_lookbook' => 'This item is already in the lookbook.',
     'item_removed' => 'Item removed successfully.',
     'outfit_created' => 'Outfit saved successfully.',
     'outfit_deleted' => 'Outfit deleted successfully.',
@@ -29,4 +30,5 @@ return [
     'packing_list_updated' => 'Packing list updated successfully.',
     'packing_list_deleted' => 'Packing list deleted successfully.',
     'export_started' => 'Export started. You will be notified when ready.',
+    'garmentLimitReached' => 'Maximum of 200 garments allowed.',
 ];

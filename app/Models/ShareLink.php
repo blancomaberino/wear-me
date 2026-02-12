@@ -15,10 +15,8 @@ class ShareLink extends Model
     protected $fillable = [
         'shareable_type',
         'shareable_id',
-        'token',
         'expires_at',
         'is_active',
-        'view_count',
     ];
 
     protected function casts(): array

@@ -26,4 +26,7 @@ export default {
     addNote: 'Add a note',
     reorder: 'Reorder Items',
     confirmDelete: 'Are you sure you want to delete this lookbook?',
+    setCover: 'Set as Cover',
+    currentCover: 'Cover',
+    editDetails: 'Edit Details',
 };

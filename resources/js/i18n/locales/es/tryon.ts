@@ -75,4 +75,7 @@ export default {
   page: 'Página {{current}} de {{last}}',
   tryOnResult: 'Resultado de prueba',
   takePhoto: 'Tomar Foto',
+  chipOther: 'Otro...',
+  contentDisclaimerTitle: 'Pautas de contenido',
+  contentDisclaimerDesc: 'La IA puede no generar resultados para ropa reveladora como trajes de baño, bikinis, lencería o artículos similares. Para mejores resultados, use ropa cotidiana como camisas, pantalones, vestidos y chaquetas.',
 };

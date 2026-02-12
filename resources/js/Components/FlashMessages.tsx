@@ -1,6 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, X } from 'lucide-react';
+import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function FlashMessages() {
@@ -15,8 +15,11 @@ export default function FlashMessages() {
         } else if (flash?.error) {
             setMessage({ type: 'error', text: flash.error });
             setVisible(true);
+        } else if (flash?.info) {
+            setMessage({ type: 'info', text: flash.info });
+            setVisible(true);
         }
-    }, [flash?.success, flash?.error]);
+    }, [flash?.success, flash?.error, flash?.info]);
 
     useEffect(() => {
         if (visible) {
@@ -33,9 +36,12 @@ export default function FlashMessages() {
                 'flex items-center gap-3 rounded-card px-4 py-3 shadow-medium border min-w-[300px] max-w-md',
                 message.type === 'success' && 'bg-emerald-50 border-emerald-200 text-emerald-800',
                 message.type === 'error' && 'bg-red-50 border-red-200 text-red-800',
+                message.type === 'info' && 'bg-blue-50 border-blue-200 text-blue-800',
             )}>
                 {message.type === 'success' ? (
                     <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0" />
+                ) : message.type === 'info' ? (
+                    <Info className="h-5 w-5 text-blue-500 shrink-0" />
                 ) : (
                     <XCircle className="h-5 w-5 text-red-500 shrink-0" />
                 )}

@@ -15,11 +15,12 @@ export default function ImageUploader({
     onFileSelected,
     uploading = false,
     progress = 0,
-    accept = ['image/jpeg', 'image/png', 'image/webp'],
+    accept = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
     label = 'Upload Image',
 }: ImageUploaderProps) {
     const { t } = useTranslation();
     const cameraInputRef = useRef<HTMLInputElement>(null);
+    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent);
 
     const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -46,7 +47,7 @@ export default function ImageUploader({
                 ref={cameraInputRef}
                 type="file"
                 accept="image/*"
-                capture="environment"
+                {...(isMobile ? { capture: 'environment' } : {})}
                 onChange={handleCameraCapture}
                 className="hidden"
             />

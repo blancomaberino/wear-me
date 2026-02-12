@@ -13,7 +13,7 @@ class LookbookService
         return $user->lookbooks()->create($data);
     }
 
-    public function addItem(Lookbook $lookbook, string $itemableType, int $itemableId, ?string $note = null): LookbookItem
+    public function addItem(Lookbook $lookbook, string $itemableType, int $itemableId, ?string $note = null): ?LookbookItem
     {
         $morphClass = match ($itemableType) {
             'tryon_result' => \App\Models\TryOnResult::class,
@@ -25,6 +25,16 @@ class LookbookService
         $morphClass::where('id', $itemableId)
             ->where('user_id', $lookbook->user_id)
             ->firstOrFail();
+
+        // Check for duplicate
+        $existing = $lookbook->items()
+            ->where('itemable_type', $morphClass)
+            ->where('itemable_id', $itemableId)
+            ->first();
+
+        if ($existing) {
+            return null;
+        }
 
         $maxOrder = $lookbook->items()->max('sort_order') ?? -1;
 

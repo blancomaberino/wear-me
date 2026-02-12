@@ -52,7 +52,9 @@ class ProcessBulkGarment implements ShouldQueue
 
             throw $e;
         } finally {
-            Storage::disk('local')->delete($this->tempPath);
+            if (file_exists($fullPath)) {
+                Storage::disk('local')->delete($this->tempPath);
+            }
         }
     }
 }

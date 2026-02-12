@@ -17,6 +17,7 @@ class UpdateLookbookRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'is_public' => 'sometimes|boolean',
+            'cover_item_id' => 'nullable|integer|exists:lookbook_items,id',
         ];
     }
 }

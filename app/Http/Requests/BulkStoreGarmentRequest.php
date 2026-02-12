@@ -17,7 +17,7 @@ class BulkStoreGarmentRequest extends FormRequest
     {
         return [
             'images' => 'required|array|min:1|max:20',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp,avif|max:10240',
             'category' => ['required', Rule::enum(GarmentCategory::class)],
         ];
     }

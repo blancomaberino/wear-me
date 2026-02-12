@@ -8,6 +8,7 @@ import { Camera, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import CameraDialog from '@/Components/CameraDialog';
 
 interface Props {
     modelImages: ModelImage[];
@@ -20,7 +21,9 @@ interface Props {
 export default function SelectPhoto({ modelImages, selectedPhotoId, onSelectPhoto, sourceResult, onClearSource }: Props) {
     const { t } = useTranslation();
     const [uploading, setUploading] = useState(false);
+    const [showCamera, setShowCamera] = useState(false);
     const cameraInputRef = useRef<HTMLInputElement>(null);
+    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent);
 
     const handleCameraCapture = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -35,6 +38,18 @@ export default function SelectPhoto({ modelImages, selectedPhotoId, onSelectPhot
             onError: () => setUploading(false),
         });
         if (cameraInputRef.current) cameraInputRef.current.value = '';
+    }, []);
+
+    const handleWebcamCapture = useCallback((file: File) => {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('image', file);
+        router.post(route('model-images.store'), formData as any, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => setUploading(false),
+            onError: () => setUploading(false),
+        });
     }, []);
 
     const onDrop = useCallback((files: File[]) => {
@@ -53,7 +68,7 @@ export default function SelectPhoto({ modelImages, selectedPhotoId, onSelectPhot
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] },
+        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.avif'] },
         maxFiles: 1,
         maxSize: 10 * 1024 * 1024,
         disabled: uploading,
@@ -84,7 +99,7 @@ export default function SelectPhoto({ modelImages, selectedPhotoId, onSelectPhot
                 ref={cameraInputRef}
                 type="file"
                 accept="image/*"
-                capture="user"
+                {...(isMobile ? { capture: 'user' } : {})}
                 onChange={handleCameraCapture}
                 className="hidden"
             />
@@ -109,12 +124,17 @@ export default function SelectPhoto({ modelImages, selectedPhotoId, onSelectPhot
             {!uploading && (
                 <button
                     type="button"
-                    onClick={() => cameraInputRef.current?.click()}
+                    onClick={() => isMobile ? cameraInputRef.current?.click() : setShowCamera(true)}
                     className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-surface-200 bg-white text-surface-600 hover:bg-surface-50 transition-colors text-caption font-medium"
                 >
                     <Camera className="h-3.5 w-3.5" /> {t('tryon.takePhoto')}
                 </button>
             )}
+            <CameraDialog
+                open={showCamera}
+                onClose={() => setShowCamera(false)}
+                onCapture={handleWebcamCapture}
+            />
         </div>
     );
 

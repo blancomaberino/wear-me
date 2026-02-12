@@ -132,7 +132,9 @@ class GenerateExport implements ShouldQueue
                 }
             }
 
-            $zip->close();
+            if ($zip->close() !== true) {
+                throw new \RuntimeException('Failed to finalize ZIP archive');
+            }
 
             // Enforce maximum export size
             $fileSize = filesize($fullZipPath);

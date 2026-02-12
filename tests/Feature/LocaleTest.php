@@ -178,7 +178,7 @@ class LocaleTest extends TestCase
         $response->assertInertia(fn ($page) => $page->where('locale', 'es'));
     }
 
-    public function test_locale_cookie_has_long_expiry(): void
+    public function test_locale_cookie_value_is_set_correctly(): void
     {
         $user = User::factory()->create();
 

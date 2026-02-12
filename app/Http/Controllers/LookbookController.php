@@ -57,7 +57,21 @@ class LookbookController extends Controller
     {
         $this->authorize('update', $lookbook);
 
-        $lookbook->update($request->validated());
+        $validated = $request->validated();
+
+        // Handle cover image from a lookbook item
+        if (!empty($validated['cover_item_id'])) {
+            $item = $lookbook->items()->where('id', $validated['cover_item_id'])->with('itemable')->first();
+            if ($item && $item->itemable) {
+                $coverPath = $item->itemable->result_path ?? $item->itemable->path ?? null;
+                if ($coverPath) {
+                    $validated['cover_image_path'] = $coverPath;
+                }
+            }
+            unset($validated['cover_item_id']);
+        }
+
+        $lookbook->update($validated);
 
         return redirect()->back()->with('success', __('messages.lookbook_updated'));
     }
@@ -81,12 +95,16 @@ class LookbookController extends Controller
             'note' => 'nullable|string|max:500',
         ]);
 
-        $this->lookbookService->addItem(
+        $item = $this->lookbookService->addItem(
             $lookbook,
             $request->input('itemable_type'),
             $request->input('itemable_id'),
             $request->input('note')
         );
+
+        if (!$item) {
+            return redirect()->back()->with('info', __('messages.item_already_in_lookbook'));
+        }
 
         return redirect()->back()->with('success', __('messages.item_added'));
     }

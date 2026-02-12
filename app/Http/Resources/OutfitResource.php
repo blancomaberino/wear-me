@@ -16,7 +16,7 @@ class OutfitResource extends JsonResource
             'notes' => $this->notes,
             'harmony_score' => $this->harmony_score,
             'template' => $this->whenLoaded('template', fn () => $this->template ? new OutfitTemplateResource($this->template) : null),
-            'garments' => GarmentSummaryResource::collection($this->whenLoaded('garments')),
+            'garments' => $this->whenLoaded('garments', fn () => GarmentSummaryResource::collection($this->garments)),
             'created_at' => $this->created_at->diffForHumans(),
         ];
     }

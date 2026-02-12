@@ -48,8 +48,8 @@ export default function DuplicateWarningDialog({ open, onClose, duplicates, onKe
                 </div>
 
                 <div className="flex justify-end gap-3 pt-2">
-                    <Button variant="ghost" onClick={() => { onSkip(); onClose(); }}>{t('import.duplicateSkip')}</Button>
-                    <Button onClick={() => { onKeep(); onClose(); }}>{t('import.duplicateKeep')}</Button>
+                    <Button variant="ghost" onClick={onSkip}>{t('import.duplicateSkip')}</Button>
+                    <Button onClick={onKeep}>{t('import.duplicateKeep')}</Button>
                 </div>
             </div>
         </Dialog>

@@ -21,7 +21,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
     i18n.changeLanguage(newLocale);
     // Persist to server
     router.post(route('locale.update'), { locale: newLocale }, {
-      preserveState: false,
+      preserveState: true,
       preserveScroll: true,
     });
   };

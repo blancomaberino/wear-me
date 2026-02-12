@@ -20,6 +20,7 @@ class Garment extends Model
         'original_filename',
         'thumbnail_path',
         'category',
+        'clothing_type',
         'name',
         'description',
         'color_tags',

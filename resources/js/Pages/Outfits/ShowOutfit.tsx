@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
     outfit: Outfit;
-    garments: Garment[];
 }
 
 export default function ShowOutfit({ outfit }: Props) {
@@ -39,7 +38,7 @@ export default function ShowOutfit({ outfit }: Props) {
                                 <ArrowLeft className="h-4 w-4" /> {t('common.back')}
                             </Button>
                         </Link>
-                        <Button variant="outline" size="sm" onClick={handleDelete}>
+                        <Button variant="outline" size="sm" onClick={handleDelete} aria-label={t('outfits.deleteOutfit')}>
                             <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>

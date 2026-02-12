@@ -47,7 +47,7 @@ export default function BulkUploadDialog({ open, onClose }: Props) {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] },
+        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.avif'] },
         maxSize: 10 * 1024 * 1024,
         maxFiles: 20,
     });

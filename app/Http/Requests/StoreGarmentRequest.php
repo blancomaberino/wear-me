@@ -16,8 +16,9 @@ class StoreGarmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp,avif|max:10240',
             'category' => ['required', Rule::enum(GarmentCategory::class)],
+            'clothing_type' => 'nullable|string|max:50',
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'size_label' => 'nullable|string|max:20',

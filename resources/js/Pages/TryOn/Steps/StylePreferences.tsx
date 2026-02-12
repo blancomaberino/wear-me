@@ -6,6 +6,7 @@ import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { Ruler, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useRef } from 'react';
 
 interface Props {
     promptHint: string;
@@ -16,6 +17,7 @@ interface Props {
 
 export default function StylePreferences({ promptHint, onPromptChange, user, selectedGarments }: Props) {
     const { t } = useTranslation();
+    const customInputRef = useRef<HTMLInputElement>(null);
 
     const styleChips = [
         { value: 'casual', label: t('tryon.chipCasual') },
@@ -64,11 +66,19 @@ export default function StylePreferences({ promptHint, onPromptChange, user, sel
                             </button>
                         );
                     })}
+                    <button
+                        type="button"
+                        onClick={() => customInputRef.current?.focus()}
+                        className="px-3 py-1.5 rounded-pill text-body-sm font-medium transition-colors border border-dashed border-surface-300 text-surface-500 hover:border-brand-400 hover:text-brand-600"
+                    >
+                        {t('tryon.chipOther')}
+                    </button>
                 </div>
             </div>
 
             {/* Custom instructions */}
             <Input
+                ref={customInputRef}
                 label={t('tryon.additionalInstructions')}
                 value={promptHint}
                 onChange={(e) => onPromptChange(e.target.value)}

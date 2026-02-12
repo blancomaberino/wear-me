@@ -50,7 +50,7 @@ class ImportController extends Controller
         $user = $request->user();
 
         if ($user->garments()->count() >= 200) {
-            return redirect()->back()->withErrors(['url' => 'Maximum of 200 garments allowed.']);
+            return redirect()->back()->withErrors(['url' => __('messages.garmentLimitReached')]);
         }
 
         $tempPath = null;

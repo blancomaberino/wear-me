@@ -59,9 +59,13 @@ export default function ShareDialog({ open, onClose, shareableType, shareableId 
 
     const handleCopy = async () => {
         if (shareUrl) {
-            await navigator.clipboard.writeText(shareUrl);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch {
+                // Clipboard API unavailable
+            }
         }
     };
 

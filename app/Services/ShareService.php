@@ -57,12 +57,16 @@ class ShareService
             return false;
         }
 
-        $link->reactions()->create([
-            'type' => $type,
-            'visitor_hash' => $visitorHash,
-            'created_at' => now(),
-        ]);
+        try {
+            $link->reactions()->create([
+                'type' => $type,
+                'visitor_hash' => $visitorHash,
+                'created_at' => now(),
+            ]);
 
-        return true;
+            return true;
+        } catch (\Illuminate\Database\QueryException $e) {
+            return false;
+        }
     }
 }

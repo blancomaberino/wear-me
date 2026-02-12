@@ -22,6 +22,7 @@ return [
     'lookbook_updated' => 'Lookbook actualizado con exito.',
     'lookbook_deleted' => 'Lookbook eliminado con exito.',
     'item_added' => 'Elemento añadido con exito.',
+    'item_already_in_lookbook' => 'Este elemento ya está en el lookbook.',
     'item_removed' => 'Elemento eliminado con exito.',
     'outfit_created' => 'Outfit guardado con éxito.',
     'outfit_deleted' => 'Outfit eliminado con éxito.',
@@ -29,4 +30,5 @@ return [
     'packing_list_updated' => 'Lista de equipaje actualizada con éxito.',
     'packing_list_deleted' => 'Lista de equipaje eliminada con éxito.',
     'export_started' => 'Exportacion iniciada. Se te notificara cuando este lista.',
+    'garmentLimitReached' => 'Máximo de 200 prendas permitidas.',
 ];

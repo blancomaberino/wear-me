@@ -17,6 +17,7 @@ class OutfitSuggestionController extends Controller
         $suggestions = $request->user()
             ->outfitSuggestions()
             ->latest()
+            ->limit(50)
             ->get();
 
         return Inertia::render('Outfits/Suggestions', [
@@ -48,6 +49,7 @@ class OutfitSuggestionController extends Controller
             ->outfitSuggestions()
             ->where('is_saved', true)
             ->latest()
+            ->limit(50)
             ->get();
 
         return Inertia::render('Outfits/Saved', [
