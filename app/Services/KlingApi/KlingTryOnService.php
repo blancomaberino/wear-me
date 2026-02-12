@@ -24,6 +24,7 @@ class KlingTryOnService
             'Authorization' => 'Bearer ' . $token,
             'Content-Type' => 'application/json',
         ])->post($baseUrl . '/v1/images/kolors-virtual-try-on', [
+            'model_name' => config('services.kling.tryon_model'),
             'human_image' => $humanImageBase64,
             'cloth_image' => $clothImageBase64,
         ]);
