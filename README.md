@@ -1,59 +1,260 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# WearMe
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat&logo=laravel)](https://laravel.com)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![Inertia.js](https://img.shields.io/badge/Inertia.js-2.0-9553E9?style=flat)](https://inertiajs.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-06B6D4?style=flat&logo=tailwindcss)](https://tailwindcss.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## About Laravel
+WearMe is an AI-powered virtual wardrobe and try-on platform that lets you upload clothing photos, create a digital wardrobe, and virtually try on outfits using artificial intelligence. Perfect for wardrobe organization, outfit planning, trip packing, and discovering new style combinations.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## About
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+WearMe combines modern web technologies with AI-powered virtual try-on capabilities to help users manage their wardrobe digitally. Upload your clothing items and model photos, then use AI to see how different outfit combinations look on you before getting dressed. Create lookbooks, plan outfits for trips, get AI-powered outfit suggestions, and share your favorite looks with friends.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+### Digital Wardrobe Management
+Organize your clothing with smart categorization (upper/lower/dress), detailed metadata (brand, material, size, measurements, color tags), and bulk upload capabilities. Import items directly from Amazon URLs with automatic metadata extraction. Supports up to 200 garments per user with duplicate detection.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### AI Virtual Try-On
+Powered by Kling AI, generate realistic virtual try-on images with single or multi-garment combinations. Chain try-ons using previous results as a base, apply style preferences with custom prompts, and generate animated try-on videos. Browse your try-on history and save favorites.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Smart Outfit Planning
+Get AI-powered outfit suggestions based on occasion context with color harmony scoring and fit analysis. Create named lookbooks with descriptions and cover images, organize looks with drag-and-drop reordering, and share publicly with emoji reactions.
 
-## Laravel Sponsors
+### Trip Planning
+Build packing lists for specific trips with date ranges, assign garments to days and occasions, and track packing progress with check-off functionality.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Social Sharing
+Share lookbooks and try-on results via public token-based links with emoji reactions (heart, fire, thumbs up/down) and view count tracking. Privacy controls let you toggle public/private visibility.
 
-### Premium Partners
+### Export & Backup
+Export your complete wardrobe data as JSON with optional images and try-on results packaged in a ZIP archive (500MB limit, 24-hour expiry).
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Internationalization
+Full support for English and Spanish with 17 translation namespaces covering all application features.
 
-## Contributing
+## Tech Stack
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Backend
+- **Laravel 11** - Modern PHP web framework
+- **PHP 8.2+** - Server-side language
+- **Sanctum** - API authentication
+- **Laravel Breeze** - Authentication scaffolding
+- **Socialite** - Google OAuth integration
+- **SQLite/MySQL** - Database options
+- **Database Queue** - Background job processing
 
-## Code of Conduct
+### Frontend
+- **React 18** - UI library
+- **TypeScript** - Type-safe JavaScript
+- **Inertia.js 2.0** - Modern monolith architecture
+- **Tailwind CSS 4.0** - Utility-first CSS
+- **Headless UI** - Accessible UI components
+- **Vite 7** - Build tool
+- **i18next** - Internationalization
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### External Services
+- **Kling AI API** - Virtual try-on generation
+- **Gemini** - Alternative AI provider (optional)
 
-## Security Vulnerabilities
+### Development & Testing
+- **PHPUnit** - 321 feature and unit tests
+- **Playwright** - End-to-end testing
+- **Docker DevContainer** - Containerized development environment (PHP 8.3-FPM, MySQL 8.0, Redis 7, Mailpit)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Prerequisites
+
+- PHP 8.2 or higher
+- Composer
+- Node.js 18+ and npm
+- SQLite or MySQL database
+- Kling AI API credentials (required for try-on features)
+
+## Quick Start
+
+### Using Composer Scripts
+
+```bash
+# One-time setup: install dependencies, configure .env, generate key, migrate database
+composer setup
+
+# Development: runs serve, queue worker, pail logger, and vite dev server in parallel
+composer dev
+```
+
+### Manual Setup
+
+```bash
+# Install PHP dependencies
+composer install
+
+# Copy environment file and generate application key
+cp .env.example .env
+php artisan key:generate
+
+# Run database migrations
+php artisan migrate
+
+# Create storage symlink
+php artisan storage:link
+
+# Install frontend dependencies and build assets
+npm install
+npm run build
+
+# Start development server (in separate terminals)
+php artisan serve
+php artisan queue:work
+```
+
+### Docker DevContainer
+
+The project includes a complete Docker development environment:
+
+```bash
+cd .devcontainer
+docker-compose up -d
+```
+
+Includes PHP 8.3-FPM, MySQL 8.0, Redis 7, and Mailpit for email testing.
+
+## Configuration
+
+### Required Environment Variables
+
+```env
+APP_NAME=WearMe
+APP_URL=http://localhost:8000
+DB_CONNECTION=sqlite
+
+# Kling AI (required for virtual try-on)
+KLING_ACCESS_KEY=your_access_key
+KLING_SECRET_KEY=your_secret_key
+TRYON_PROVIDER=kling
+
+# Optional: Gemini provider
+GEMINI_API_KEY=your_api_key
+
+# Optional: Google OAuth
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+```
+
+### Queue Configuration
+
+The application uses database-driven queues for background processing. Ensure a queue worker is running:
+
+```bash
+php artisan queue:work --tries=3 --timeout=300
+```
+
+Background jobs include:
+- **ProcessTryOn** - Submit try-on requests to AI provider
+- **PollProviderTask** - Poll for try-on results (30 attempts, 10s delay)
+- **ProcessTryOnVideo** - Generate animated try-on videos
+- **PollKlingTask** - Poll for video generation results
+- **GenerateOutfitSuggestion** - AI-powered outfit combinations
+- **ProcessBulkGarment** - Background bulk garment uploads
+- **GenerateExport** - Create wardrobe export archives
+
+## Development
+
+### Available Commands
+
+```bash
+# Development server with hot reload
+npm run dev
+
+# Build for production
+npm run build
+
+# Run PHP tests (321 tests)
+php artisan test
+
+# Run E2E tests
+npm run test:e2e
+
+# Interactive E2E testing
+npm run test:e2e:ui
+
+# Run queue worker
+php artisan queue:work
+
+# Restart queue workers (after code changes)
+php artisan queue:restart
+
+# Monitor logs
+php artisan pail
+```
+
+### Testing
+
+The application includes comprehensive test coverage:
+
+- **321 PHPUnit tests** - Feature and unit tests covering all major functionality
+- **28 feature test files** - Controllers, services, jobs, and policies
+- **4 unit test files** - Core business logic
+- **Playwright E2E tests** - Full user journey testing
+
+Test environment uses in-memory SQLite, array cache, synchronous queue, and array mail driver for fast, isolated testing.
+
+## Project Structure
+
+```
+app/
+├── Contracts/          # Interface definitions (TryOnProviderContract)
+├── Enums/              # Enumeration classes (GarmentCategory, ProcessingStatus)
+├── Http/
+│   ├── Controllers/    # 17 application controllers
+│   ├── Requests/       # Form validation requests
+│   └── Resources/      # Inertia API resources
+├── Jobs/               # 7 background queue jobs
+├── Models/             # 15 Eloquent models
+├── Policies/           # Authorization policies
+└── Services/           # 13 business logic services
+    ├── TryOn/          # Try-on orchestration
+    ├── KlingApi/       # Kling AI integration
+    └── Scraper/        # Amazon import scraping
+
+resources/
+├── js/
+│   ├── Components/     # Reusable React components
+│   ├── i18n/locales/   # Translation files (en/, es/)
+│   ├── Layouts/        # Page layout components
+│   ├── Pages/          # 37 Inertia page components
+│   └── types/          # TypeScript type definitions
+└── css/                # Application styles
+
+tests/
+├── Feature/            # 28 feature test files
+└── Unit/               # 4 unit test files
+
+database/
+├── migrations/         # Database schema migrations
+└── seeders/            # Database seeders
+```
+
+## Internationalization
+
+WearMe supports multiple languages through i18next:
+
+- **English** (default)
+- **Spanish** (Español)
+
+Translation files are organized into 17 namespaces: `common`, `wardrobe`, `tryon`, `outfits`, `lookbooks`, `share`, `processing`, `packing`, `export`, `nav`, `import`, `auth`, `dashboard`, `photos`, `profile`, `videos`, and `welcome`.
+
+Language preference is stored in cookies with automatic browser detection fallback.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+WearMe is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+## Getting Help
+
+For issues or questions, please check the documentation in the codebase or review the test files for usage examples.

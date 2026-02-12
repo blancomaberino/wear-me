@@ -9,6 +9,7 @@ use App\Services\Scraper\UrlValidator;
 use App\Services\WardrobeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 
@@ -29,6 +30,11 @@ class ImportController extends Controller
                 'product' => $product->toArray(),
             ]);
         } catch (\Throwable $e) {
+            Log::error('Import preview failed', [
+                'url' => $request->input('url'),
+                'error' => $e->getMessage(),
+                'class' => get_class($e),
+            ]);
             return response()->json([
                 'success' => false,
                 'error' => __('import.importError'),
@@ -105,6 +111,11 @@ class ImportController extends Controller
 
             return redirect()->back()->with('success', __('import.importSuccess'));
         } catch (\Throwable $e) {
+            Log::error('Import confirm failed', [
+                'image_url' => $request->input('image_url'),
+                'error' => $e->getMessage(),
+                'class' => get_class($e),
+            ]);
             return redirect()->back()->withErrors(['url' => __('import.importError')]);
         } finally {
             if ($tempPath && Storage::disk('local')->exists($tempPath)) {
