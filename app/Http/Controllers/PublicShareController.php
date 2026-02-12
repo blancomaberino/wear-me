@@ -27,13 +27,37 @@ class PublicShareController extends Controller
 
         if ($link->shareable) {
             if ($type === 'TryOnResult') {
-                $link->shareable->load('garments');
+                $content = [
+                    'id' => $link->shareable->id,
+                    'result_url' => $link->shareable->result_url,
+                ];
             } elseif ($type === 'Lookbook') {
                 $link->shareable->load(['items' => function ($q) {
                     $q->orderBy('sort_order')->with('itemable');
                 }]);
+                $content = [
+                    'id' => $link->shareable->id,
+                    'name' => $link->shareable->name,
+                    'description' => $link->shareable->description,
+                    'items' => $link->shareable->items->map(function ($item) {
+                        $itemable = null;
+                        if ($item->itemable instanceof \App\Models\TryOnResult) {
+                            $itemable = [
+                                'result_url' => $item->itemable->result_url,
+                            ];
+                        } elseif ($item->itemable instanceof \App\Models\OutfitSuggestion) {
+                            $itemable = [
+                                'suggestion_text' => $item->itemable->suggestion_text,
+                                'occasion' => $item->itemable->occasion,
+                            ];
+                        }
+                        return [
+                            'id' => $item->id,
+                            'itemable' => $itemable,
+                        ];
+                    })->values()->all(),
+                ];
             }
-            $content = $link->shareable;
         }
 
         return Inertia::render('Public/SharedView', [
@@ -49,7 +73,7 @@ class PublicShareController extends Controller
 
     public function react(Request $request, string $token)
     {
-        $link = $this->shareService->resolveShareLink($token);
+        $link = $this->shareService->resolveShareLink($token, incrementViews: false);
 
         if (!$link) {
             abort(404);

@@ -23,4 +23,5 @@ export default {
     duplicateKeep: 'Keep Both',
     duplicateSkip: 'Skip This',
     duplicateMatch: '{{percent}}% similar',
+    unnamedGarment: 'Unnamed garment',
 };

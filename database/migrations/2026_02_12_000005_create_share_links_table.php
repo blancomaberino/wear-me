@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('shareable_type');
             $table->unsignedBigInteger('shareable_id');
+            $table->index(['shareable_type', 'shareable_id']);
             $table->string('token', 64)->unique();
             $table->timestamp('expires_at')->nullable();
             $table->boolean('is_active')->default(true);

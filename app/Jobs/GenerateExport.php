@@ -154,7 +154,14 @@ class GenerateExport implements ShouldQueue
                 'error' => $e->getMessage(),
             ]);
 
-            $this->export->update(['status' => 'failed']);
+            // Only mark as permanently failed on last attempt
+            if ($this->attempts() >= $this->tries) {
+                $this->export->update(['status' => 'failed']);
+            } else {
+                $this->export->update(['status' => 'pending']);
+            }
+
+            throw $e;
         }
     }
 }

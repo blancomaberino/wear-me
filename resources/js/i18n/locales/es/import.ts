@@ -23,4 +23,5 @@ export default {
     duplicateKeep: 'Conservar ambas',
     duplicateSkip: 'Omitir esta',
     duplicateMatch: '{{percent}}% similar',
+    unnamedGarment: 'Prenda sin nombre',
 };

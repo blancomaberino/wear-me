@@ -27,4 +27,6 @@ export default {
   dropHere: 'Drop it here!',
   dragDrop: 'Drag and drop or click to browse',
   fileHint: 'JPG, PNG, WebP up to 10MB',
+  garments: 'Garments',
+  garment: 'Garment',
 };

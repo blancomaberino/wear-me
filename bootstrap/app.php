@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        $middleware->encryptCookies(except: ['locale']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

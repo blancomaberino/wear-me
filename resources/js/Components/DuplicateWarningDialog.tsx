@@ -38,7 +38,7 @@ export default function DuplicateWarningDialog({ open, onClose, duplicates, onKe
                                 <div className="w-12 h-12 rounded-input bg-surface-200" />
                             )}
                             <div className="flex-1 min-w-0">
-                                <p className="text-body-sm text-surface-900 truncate">{dup.name || 'Unnamed garment'}</p>
+                                <p className="text-body-sm text-surface-900 truncate">{dup.name || t('import.unnamedGarment')}</p>
                                 <p className="text-caption text-amber-600 font-medium">
                                     {t('import.duplicateMatch', { percent: dup.similarity })}
                                 </p>
@@ -48,8 +48,8 @@ export default function DuplicateWarningDialog({ open, onClose, duplicates, onKe
                 </div>
 
                 <div className="flex justify-end gap-3 pt-2">
-                    <Button variant="ghost" onClick={onSkip}>{t('import.duplicateSkip')}</Button>
-                    <Button onClick={onKeep}>{t('import.duplicateKeep')}</Button>
+                    <Button variant="ghost" onClick={() => { onSkip(); onClose(); }}>{t('import.duplicateSkip')}</Button>
+                    <Button onClick={() => { onKeep(); onClose(); }}>{t('import.duplicateKeep')}</Button>
                 </div>
             </div>
         </Dialog>

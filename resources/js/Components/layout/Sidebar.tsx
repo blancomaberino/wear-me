@@ -50,9 +50,7 @@ function Sidebar({ className }: SidebarProps) {
             {/* Logo */}
             <div className="flex items-center gap-2.5 px-6 h-16 border-b border-surface-100">
                 <Link href="/" className="flex items-center gap-2.5">
-                    <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-brand-600">
-                        <Shirt className="h-5 w-5 text-white" />
-                    </div>
+                    <img src="/icons/icon-192.png" alt="WearMe" className="h-9 w-9 rounded-xl" />
                     <span className="text-heading-sm text-surface-900">{t('nav.brandName')}</span>
                 </Link>
             </div>

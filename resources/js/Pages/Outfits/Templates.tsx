@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageHeader } from '@/Components/layout/PageHeader';
 import { Card, CardBody } from '@/Components/ui/Card';
+import { Button } from '@/Components/ui/Button';
 import { Badge } from '@/Components/ui/Badge';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Head, Link } from '@inertiajs/react';
@@ -22,12 +23,20 @@ export default function Templates({ templates }: Props) {
             <PageHeader
                 title={t('outfits.templatesTitle')}
                 description={t('outfits.templatesDesc')}
-                actions={
-                    <Link href={route('my-outfits.index')} className="text-body-sm text-brand-600 hover:text-brand-700 font-medium">
-                        {t('outfits.myOutfitsTitle')}
-                    </Link>
-                }
             />
+
+            <div className="flex gap-2 mb-4">
+                <Link href={route('outfits.index')}>
+                    <Button variant="ghost" size="sm">{t('outfits.suggestionsTab')}</Button>
+                </Link>
+                <Button variant="primary" size="sm">{t('outfits.templatesTab')}</Button>
+                <Link href={route('my-outfits.index')}>
+                    <Button variant="ghost" size="sm">{t('outfits.myOutfitsTab')}</Button>
+                </Link>
+                <Link href={route('outfits.saved')}>
+                    <Button variant="ghost" size="sm">{t('outfits.savedTab')}</Button>
+                </Link>
+            </div>
 
             {templates.length === 0 ? (
                 <EmptyState icon={Layout} title={t('outfits.templatesTitle')} description={t('outfits.templatesDesc')} />

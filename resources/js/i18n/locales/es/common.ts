@@ -27,4 +27,6 @@ export default {
   dropHere: '¡Sueltelo aqui!',
   dragDrop: 'Arrastre y suelte o haga clic para buscar',
   fileHint: 'JPG, PNG, WebP hasta 10MB',
+  garments: 'Prendas',
+  garment: 'Prenda',
 };

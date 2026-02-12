@@ -4,6 +4,7 @@ import { Card, CardBody } from '@/Components/ui/Card';
 import { Button } from '@/Components/ui/Button';
 import { Badge } from '@/Components/ui/Badge';
 import { Dialog } from '@/Components/ui/Dialog';
+import { EmptyState } from '@/Components/ui/EmptyState';
 import { Head, router } from '@inertiajs/react';
 import { PackingList, Garment } from '@/types';
 import { useState } from 'react';
@@ -20,13 +21,10 @@ export default function Show({ packingList, garments }: Props) {
     const [showAddGarment, setShowAddGarment] = useState(false);
     const items = packingList.items || [];
 
-    const handleTogglePacked = async (itemId: number) => {
-        const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
-        await fetch(route('packing-lists.items.toggle', { packingList: packingList.id, item: itemId }), {
-            method: 'PATCH',
-            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+    const handleTogglePacked = (itemId: number) => {
+        router.patch(route('packing-lists.items.toggle', { packingList: packingList.id, item: itemId }), {}, {
+            preserveScroll: true,
         });
-        router.reload();
     };
 
     const handleAddGarment = (garmentId: number) => {
@@ -108,9 +106,16 @@ export default function Show({ packingList, garments }: Props) {
             ))}
 
             {items.length === 0 && (
-                <div className="text-center py-8 text-surface-400 text-body-sm">
-                    {t('packing.emptyDesc')}
-                </div>
+                <EmptyState
+                    icon={Luggage}
+                    title={t('packing.emptyItems')}
+                    description={t('packing.emptyItemsDesc')}
+                    action={
+                        <Button onClick={() => setShowAddGarment(true)}>
+                            <Plus className="h-4 w-4" /> {t('packing.addGarment')}
+                        </Button>
+                    }
+                />
             )}
 
             {/* Add Garment Dialog */}
@@ -145,7 +150,7 @@ function PackingItem({ item, onToggle, onRemove, t }: any) {
             )}
             <div className="flex-1 min-w-0">
                 <p className={`text-body-sm ${item.is_packed ? 'text-surface-400 line-through' : 'text-surface-900'}`}>
-                    {item.garment?.name || item.garment?.category || 'Garment'}
+                    {item.garment?.name || item.garment?.category || t('packing.garment')}
                 </p>
                 {item.occasion && <Badge variant="neutral" size="sm">{item.occasion}</Badge>}
             </div>

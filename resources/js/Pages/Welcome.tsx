@@ -15,9 +15,7 @@ export default function Welcome() {
                 <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-surface-100">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                            <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-brand-600">
-                                <Shirt className="h-5 w-5 text-white" />
-                            </div>
+                            <img src="/icons/icon-192.png" alt="WearMe" className="h-9 w-9 rounded-xl" />
                             <span className="text-heading-sm text-surface-900">{t('nav.brandName')}</span>
                         </div>
                         <div className="flex items-center gap-3">

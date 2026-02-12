@@ -29,8 +29,25 @@ class OutfitSuggestionTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Outfits/Suggestions')
-                ->has('suggestions.data', 3)
+                ->has('suggestions', 3)
                 ->has('garmentCount')
+                ->has('lookbooks')
+            );
+    }
+
+    public function test_suggestions_is_flat_array_not_paginated(): void
+    {
+        $user = User::factory()->create();
+        OutfitSuggestion::factory(2)->for($user)->create();
+
+        $this->actingAs($user)
+            ->get(route('outfits.index'))
+            ->assertInertia(fn ($page) => $page
+                ->has('suggestions', 2)
+                ->has('suggestions.0.id')
+                ->missing('suggestions.data')
+                ->missing('suggestions.meta')
+                ->missing('suggestions.links')
             );
     }
 
@@ -146,8 +163,24 @@ class OutfitSuggestionTest extends TestCase
         $this->actingAs($user)
             ->get(route('outfits.index'))
             ->assertInertia(fn ($page) => $page
-                ->has('suggestions.data', 2)
+                ->has('suggestions', 2)
             );
+    }
+
+    public function test_frontend_occasion_values_rejected_by_backend(): void
+    {
+        $user = User::factory()->create();
+
+        // These are OLD frontend values that should NOT be accepted by backend
+        $invalidOccasions = ['formal', 'business', 'party', 'workout'];
+
+        foreach ($invalidOccasions as $occasion) {
+            $this->actingAs($user)
+                ->post(route('outfits.generate'), [
+                    'occasion' => $occasion,
+                ])
+                ->assertSessionHasErrors('occasion');
+        }
     }
 
     public function test_suggestions_include_garment_count(): void

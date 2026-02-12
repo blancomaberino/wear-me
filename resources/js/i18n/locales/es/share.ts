@@ -19,4 +19,5 @@ export default {
     react: 'Reaccionar',
     linkDeactivated: 'Este enlace ha sido desactivado',
     linkExpired: 'Este enlace ha expirado',
+    error: 'Error al crear el enlace. Inténtalo de nuevo.',
 };

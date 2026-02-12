@@ -19,4 +19,5 @@ export default {
     react: 'React',
     linkDeactivated: 'This link has been deactivated',
     linkExpired: 'This link has expired',
+    error: 'Failed to create share link. Please try again.',
 };

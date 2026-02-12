@@ -53,14 +53,23 @@ class ImportController extends Controller
             return redirect()->back()->withErrors(['url' => 'Maximum of 200 garments allowed.']);
         }
 
-        try {
-            // Validate URL is external (SSRF protection)
-            UrlValidator::validateExternalUrl($request->input('image_url'));
+        $tempPath = null;
 
-            // Download the image
-            $imageResponse = Http::timeout(15)->get($request->input('image_url'));
+        try {
+            // Validate URL is external (SSRF protection) and pin resolved IP
+            $resolvedIp = UrlValidator::validateExternalUrl($request->input('image_url'));
+
+            // Download the image with size limit (10MB), pinned DNS
+            $imageResponse = Http::withOptions(
+                UrlValidator::getSecureRequestOptions($request->input('image_url'), $resolvedIp)
+            )->timeout(15)->get($request->input('image_url'));
 
             if (!$imageResponse->successful()) {
+                return redirect()->back()->withErrors(['url' => __('import.importError')]);
+            }
+
+            $body = $imageResponse->body();
+            if (strlen($body) > 10 * 1024 * 1024) {
                 return redirect()->back()->withErrors(['url' => __('import.importError')]);
             }
 
@@ -75,12 +84,12 @@ class ImportController extends Controller
             $extension = $this->guessExtension(explode(';', $contentType)[0]);
             $tempName = 'import_' . uniqid() . '.' . $extension;
             $tempPath = 'temp/' . $tempName;
-            Storage::disk('local')->put($tempPath, $imageResponse->body());
+            Storage::disk('local')->put($tempPath, $body);
 
             $fullPath = Storage::disk('local')->path($tempPath);
             $file = new UploadedFile($fullPath, $tempName, explode(';', $contentType)[0], null, true);
 
-            $garment = $this->wardrobeService->storeGarment(
+            $this->wardrobeService->storeGarment(
                 $user,
                 [
                     'category' => $request->input('category'),
@@ -93,12 +102,13 @@ class ImportController extends Controller
                 $file
             );
 
-            // Clean up temp file
-            Storage::disk('local')->delete($tempPath);
-
             return redirect()->back()->with('success', __('import.importSuccess'));
         } catch (\Throwable $e) {
             return redirect()->back()->withErrors(['url' => __('import.importError')]);
+        } finally {
+            if ($tempPath && Storage::disk('local')->exists($tempPath)) {
+                Storage::disk('local')->delete($tempPath);
+            }
         }
     }
 

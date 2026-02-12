@@ -16,10 +16,10 @@ class TryOnVideoResource extends JsonResource
             'duration_seconds' => $this->duration_seconds,
             'error_message' => $this->error_message,
             'created_at' => $this->created_at->diffForHumans(),
-            'model_image' => ['thumbnail_url' => $this->modelImage->thumbnail_url],
+            'model_image' => ['thumbnail_url' => $this->modelImage?->thumbnail_url],
             'garment' => [
-                'name' => $this->garment->name ?? $this->garment->original_filename,
-                'thumbnail_url' => $this->garment->thumbnail_url,
+                'name' => $this->garment?->name ?? $this->garment?->original_filename ?? 'Try-on',
+                'thumbnail_url' => $this->garment?->thumbnail_url,
             ],
         ];
     }

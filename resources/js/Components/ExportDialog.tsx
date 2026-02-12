@@ -32,6 +32,7 @@ export default function ExportDialog({ open, onClose }: Props) {
                 },
                 body: JSON.stringify({ include_images: includeImages, include_results: includeResults }),
             });
+            if (!response.ok) throw new Error('Export request failed');
             const data = await response.json();
             setExportData(data.export);
             startPolling(data.export.id);
@@ -49,6 +50,7 @@ export default function ExportDialog({ open, onClose }: Props) {
                 const response = await fetch(route('export.status', { export: exportId }), {
                     headers: { 'Accept': 'application/json' },
                 });
+                if (!response.ok) throw new Error('Poll failed');
                 const data = await response.json();
                 setExportData(data.export);
                 if (data.export.status === 'completed' || data.export.status === 'failed') {
@@ -56,6 +58,7 @@ export default function ExportDialog({ open, onClose }: Props) {
                 }
             } catch {
                 if (pollRef.current) clearInterval(pollRef.current);
+                setExportData({ id: exportId, status: 'failed', file_size_bytes: null, download_url: null, created_at: '' });
             }
         }, 3000);
     };

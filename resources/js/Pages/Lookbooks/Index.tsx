@@ -45,6 +45,16 @@ export default function Index({ lookbooks }: Props) {
                 }
             />
 
+            <div className="rounded-card bg-brand-50 border border-brand-100 p-4 mb-6">
+                <div className="flex gap-3">
+                    <BookOpen className="h-5 w-5 text-brand-600 mt-0.5 shrink-0" />
+                    <div>
+                        <p className="text-body-sm font-medium text-brand-900">{t('lookbooks.infoTitle')}</p>
+                        <p className="text-caption text-brand-700 mt-1">{t('lookbooks.infoDesc')}</p>
+                    </div>
+                </div>
+            </div>
+
             {lookbooks.length === 0 ? (
                 <EmptyState
                     icon={BookOpen}

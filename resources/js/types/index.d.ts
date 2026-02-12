@@ -119,6 +119,7 @@ export interface OutfitSuggestion {
         name: string;
         thumbnail_url: string | null;
         category: string;
+        color_tags?: string[] | null;
     }[];
     suggestion_text: string;
     occasion: string | null;

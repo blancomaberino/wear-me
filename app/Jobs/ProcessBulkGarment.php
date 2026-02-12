@@ -28,14 +28,14 @@ class ProcessBulkGarment implements ShouldQueue
 
     public function handle(WardrobeService $wardrobeService): void
     {
+        $fullPath = Storage::disk('local')->path($this->tempPath);
+
+        if (!file_exists($fullPath)) {
+            Log::warning('ProcessBulkGarment: temp file not found', ['path' => $this->tempPath]);
+            return;
+        }
+
         try {
-            $fullPath = Storage::disk('local')->path($this->tempPath);
-
-            if (!file_exists($fullPath)) {
-                Log::warning('ProcessBulkGarment: temp file not found', ['path' => $this->tempPath]);
-                return;
-            }
-
             $file = new UploadedFile($fullPath, $this->originalName, null, null, true);
 
             $wardrobeService->storeGarment(
@@ -43,9 +43,6 @@ class ProcessBulkGarment implements ShouldQueue
                 ['category' => $this->category],
                 $file
             );
-
-            // Clean up temp file
-            Storage::disk('local')->delete($this->tempPath);
         } catch (\Throwable $e) {
             Log::error('ProcessBulkGarment failed', [
                 'user_id' => $this->user->id,
@@ -53,7 +50,8 @@ class ProcessBulkGarment implements ShouldQueue
                 'error' => $e->getMessage(),
             ]);
 
-            // Clean up temp file on failure too
+            throw $e;
+        } finally {
             Storage::disk('local')->delete($this->tempPath);
         }
     }

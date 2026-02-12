@@ -18,6 +18,7 @@ export default function ShareDialog({ open, onClose, shareableType, shareableId 
     const [shareUrl, setShareUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [expiresIn, setExpiresIn] = useState('never');
+    const [error, setError] = useState<string | null>(null);
 
     const expiryOptions = [
         { value: 'never', label: t('share.expiresNever') },
@@ -28,6 +29,7 @@ export default function ShareDialog({ open, onClose, shareableType, shareableId 
 
     const handleCreate = async () => {
         setLoading(true);
+        setError(null);
         const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
         try {
             const response = await fetch(route('share.store'), {
@@ -43,11 +45,14 @@ export default function ShareDialog({ open, onClose, shareableType, shareableId 
                     expires_in: expiresIn,
                 }),
             });
+            if (!response.ok) throw new Error('Failed to create share link');
             const data = await response.json();
             if (data.link?.url) {
                 setShareUrl(data.link.url);
             }
-        } catch {} finally {
+        } catch {
+            setError(t('share.error'));
+        } finally {
             setLoading(false);
         }
     };
@@ -63,12 +68,16 @@ export default function ShareDialog({ open, onClose, shareableType, shareableId 
     const handleClose = () => {
         setShareUrl(null);
         setCopied(false);
+        setError(null);
         onClose();
     };
 
     return (
         <Dialog open={open} onClose={handleClose} title={t('share.title')} size="sm">
             <div className="space-y-4">
+                {error && (
+                    <p className="text-caption text-red-600">{error}</p>
+                )}
                 {!shareUrl ? (
                     <>
                         <div>

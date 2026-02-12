@@ -30,9 +30,11 @@ class OutfitService
         }
         $outfit->garments()->attach($pivotData);
 
-        // Compute harmony score from garment colors
+        // Compute harmony score from garment colors (only hex values)
         $outfit->load('garments');
-        $colors = $outfit->garments->pluck('color_tags')->flatten()->filter()->unique()->values()->all();
+        $colors = $outfit->garments->pluck('color_tags')->flatten()->filter()
+            ->filter(fn ($c) => preg_match('/^#?[0-9a-fA-F]{6}$/', $c))
+            ->unique()->values()->all();
         if (count($colors) >= 2) {
             $score = $this->harmonyService->computeScore($colors);
             $outfit->update(['harmony_score' => $score]);

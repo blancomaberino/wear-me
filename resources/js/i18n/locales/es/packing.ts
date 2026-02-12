@@ -27,4 +27,7 @@ export default {
     suggestDesc: 'Obtener sugerencias basadas en los detalles del viaje',
     suggesting: 'Generando sugerencias...',
     confirmDelete: 'Estas seguro de que quieres eliminar esta lista?',
+    garment: 'Prenda',
+    emptyItems: 'No hay prendas en esta lista',
+    emptyItemsDesc: 'Agrega prendas de tu armario para empezar a empacar.',
 };

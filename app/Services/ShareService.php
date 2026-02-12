@@ -34,7 +34,7 @@ class ShareService
         ]);
     }
 
-    public function resolveShareLink(string $token): ?ShareLink
+    public function resolveShareLink(string $token, bool $incrementViews = true): ?ShareLink
     {
         $link = ShareLink::where('token', $token)->first();
 
@@ -42,7 +42,9 @@ class ShareService
             return null;
         }
 
-        $link->increment('view_count');
+        if ($incrementViews) {
+            $link->increment('view_count');
+        }
 
         return $link;
     }

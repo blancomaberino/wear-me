@@ -30,14 +30,20 @@ export default function MyOutfits({ outfits }: Props) {
             <PageHeader
                 title={t('outfits.myOutfitsTitle')}
                 description={t('outfits.myOutfitsDesc')}
-                actions={
-                    <Link href={route('outfits.templates')}>
-                        <Button variant="outline">
-                            <Layout className="h-4 w-4" /> {t('outfits.browseTemplates')}
-                        </Button>
-                    </Link>
-                }
             />
+
+            <div className="flex gap-2 mb-4">
+                <Link href={route('outfits.index')}>
+                    <Button variant="ghost" size="sm">{t('outfits.suggestionsTab')}</Button>
+                </Link>
+                <Link href={route('outfits.templates')}>
+                    <Button variant="ghost" size="sm">{t('outfits.templatesTab')}</Button>
+                </Link>
+                <Button variant="primary" size="sm">{t('outfits.myOutfitsTab')}</Button>
+                <Link href={route('outfits.saved')}>
+                    <Button variant="ghost" size="sm">{t('outfits.savedTab')}</Button>
+                </Link>
+            </div>
 
             {outfits.length === 0 ? (
                 <EmptyState

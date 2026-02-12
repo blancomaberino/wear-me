@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,7 @@ use Illuminate\Support\Str;
 
 class ShareLink extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'shareable_type',
         'shareable_id',
@@ -66,6 +68,13 @@ class ShareLink extends Model
 
     public function getReactionsSummaryAttribute(): array
     {
+        if ($this->relationLoaded('reactions')) {
+            return $this->reactions
+                ->groupBy('type')
+                ->map->count()
+                ->toArray();
+        }
+
         return $this->reactions()
             ->selectRaw('type, count(*) as count')
             ->groupBy('type')

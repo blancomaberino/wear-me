@@ -21,7 +21,7 @@ class PackingListController extends Controller
     {
         $lists = $request->user()
             ->packingLists()
-            ->withCount(['items', 'items as packed_items_count' => function ($q) {
+            ->withCount(['items as total_count', 'items as packed_count' => function ($q) {
                 $q->where('is_packed', true);
             }])
             ->latest()
@@ -109,8 +109,8 @@ class PackingListController extends Controller
     {
         $this->authorize('update', $packingList);
 
-        $isPacked = $this->packingListService->togglePacked($packingList, $item);
+        $this->packingListService->togglePacked($packingList, $item);
 
-        return response()->json(['is_packed' => $isPacked]);
+        return redirect()->back();
     }
 }

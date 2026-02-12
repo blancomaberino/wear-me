@@ -17,12 +17,17 @@ class GenericScraperProvider implements ScraperProviderContract
 
     public function scrape(string $url): ScrapedProduct
     {
-        UrlValidator::validateExternalUrl($url);
+        $resolvedIp = UrlValidator::validateExternalUrl($url);
 
         $response = Http::withHeaders([
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Accept' => 'text/html,application/xhtml+xml',
-        ])->timeout(15)->get($url);
+        ])->withOptions(UrlValidator::getSecureRequestOptions($url, $resolvedIp))
+          ->timeout(15)->get($url);
+
+        if (!$response->successful()) {
+            throw new \RuntimeException("Failed to fetch URL: HTTP {$response->status()}");
+        }
 
         $html = $response->body();
         $crawler = new Crawler($html);

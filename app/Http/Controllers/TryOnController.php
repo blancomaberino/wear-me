@@ -8,6 +8,7 @@ use App\Http\Resources\GarmentSummaryResource;
 use App\Http\Resources\ModelImageSummaryResource;
 use App\Http\Resources\TryOnResultResource;
 use App\Http\Resources\TryOnResultSummaryResource;
+use App\Models\Lookbook;
 use App\Models\TryOnResult;
 use App\Services\TryOnService;
 use Illuminate\Http\Request;
@@ -61,6 +62,7 @@ class TryOnController extends Controller
 
         return Inertia::render('TryOn/Result', [
             'tryOnResult' => new TryOnResultResource($tryOnResult),
+            'lookbooks' => $request->user()->lookbooks()->withCount('items')->get(),
         ]);
     }
 

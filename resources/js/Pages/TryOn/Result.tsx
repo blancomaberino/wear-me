@@ -4,20 +4,23 @@ import ProcessingStatus from '@/Components/ProcessingStatus';
 import { Button } from '@/Components/ui/Button';
 import { Card, CardBody } from '@/Components/ui/Card';
 import { Head, Link, router } from '@inertiajs/react';
-import { TryOnResult } from '@/types';
+import { TryOnResult, Lookbook } from '@/types';
 import { usePolling } from '@/hooks/usePolling';
 import { useState } from 'react';
-import { Heart, Download, Share2, Layers, Wand2 } from 'lucide-react';
+import { Heart, Download, Share2, Layers, Wand2, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import AddToLookbookDialog from '@/Components/AddToLookbookDialog';
 
 interface Props {
     tryOnResult: TryOnResult;
+    lookbooks: Lookbook[];
 }
 
-export default function Result({ tryOnResult: initial }: Props) {
+export default function Result({ tryOnResult: initial, lookbooks }: Props) {
     const { t } = useTranslation();
     const [result, setResult] = useState(initial);
     const [copied, setCopied] = useState(false);
+    const [showAddToLookbook, setShowAddToLookbook] = useState(false);
 
     usePolling({
         url: route('tryon.status', result.id),
@@ -84,6 +87,9 @@ export default function Result({ tryOnResult: initial }: Props) {
                                 <Button variant="outline" size="sm" onClick={handleShare}>
                                     <Share2 className="h-4 w-4" /> {copied ? t('tryon.copied') : t('tryon.share')}
                                 </Button>
+                                <Button variant="outline" size="sm" onClick={() => setShowAddToLookbook(true)}>
+                                    <BookOpen className="h-4 w-4" /> {t('lookbooks.addItem')}
+                                </Button>
                                 <Link href={route('tryon.index', { source_result: result.id })}>
                                     <Button variant="outline" size="sm">
                                         <Layers className="h-4 w-4" /> {t('tryon.tryOnMore')}
@@ -136,6 +142,14 @@ export default function Result({ tryOnResult: initial }: Props) {
                     </div>
                 )}
             </div>
+
+            <AddToLookbookDialog
+                open={showAddToLookbook}
+                onClose={() => setShowAddToLookbook(false)}
+                lookbooks={lookbooks}
+                itemableType="tryon_result"
+                itemableId={result.id}
+            />
         </AuthenticatedLayout>
     );
 }

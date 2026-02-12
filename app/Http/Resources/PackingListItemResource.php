@@ -11,7 +11,7 @@ class PackingListItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'garment' => new GarmentSummaryResource($this->whenLoaded('garment')),
+            'garment' => $this->whenLoaded('garment', fn () => $this->garment ? new GarmentSummaryResource($this->garment) : null),
             'day_number' => $this->day_number,
             'occasion' => $this->occasion,
             'is_packed' => $this->is_packed,
