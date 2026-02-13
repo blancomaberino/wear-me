@@ -20,6 +20,7 @@ class Garment extends Model
         'original_filename',
         'thumbnail_path',
         'category',
+        'clothing_type',
         'name',
         'description',
         'color_tags',
@@ -32,6 +33,9 @@ class Garment extends Model
         'measurement_inseam_cm',
         'measurement_shoulder_cm',
         'measurement_sleeve_cm',
+        'source_url',
+        'source_provider',
+        'perceptual_hash',
     ];
 
     protected function casts(): array

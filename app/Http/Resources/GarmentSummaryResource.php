@@ -15,6 +15,7 @@ class GarmentSummaryResource extends JsonResource
             'url' => $this->url,
             'thumbnail_url' => $this->thumbnail_url,
             'category' => $this->category->value,
+            'color_tags' => $this->color_tags,
             'size_label' => $this->size_label,
             'brand' => $this->brand,
         ];

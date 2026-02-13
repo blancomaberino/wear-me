@@ -65,26 +65,55 @@ class GeminiTryOnProvider implements TryOnProviderContract
                 : $this->buildMultiGarmentParts($modelImageBase64, $garments, $promptHint);
         }
 
-        $response = Http::timeout(120)
-            ->withHeaders(['x-goog-api-key' => $apiKey])
-            ->post($endpoint, [
-                'contents' => [
-                    [
-                        'parts' => $parts,
-                    ],
+        $payload = [
+            'contents' => [
+                [
+                    'parts' => $parts,
                 ],
-                'generationConfig' => [
-                    'responseModalities' => ['Text', 'Image'],
-                ],
-            ]);
+            ],
+            'generationConfig' => [
+                'responseModalities' => ['Text', 'Image'],
+            ],
+            'safetySettings' => [
+                ['category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold' => 'BLOCK_NONE'],
+                ['category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold' => 'BLOCK_NONE'],
+                ['category' => 'HARM_CATEGORY_HARASSMENT', 'threshold' => 'BLOCK_NONE'],
+                ['category' => 'HARM_CATEGORY_HATE_SPEECH', 'threshold' => 'BLOCK_NONE'],
+            ],
+        ];
 
-        if (!$response->successful()) {
-            Log::error('Gemini API request failed', ['status' => $response->status(), 'body' => $response->body()]);
-            throw new \RuntimeException('Virtual try-on processing failed. Please try again.');
+        $maxAttempts = 3;
+        $lastException = null;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            $response = Http::timeout(120)
+                ->withHeaders(['x-goog-api-key' => $apiKey])
+                ->post($endpoint, $payload);
+
+            if (!$response->successful()) {
+                Log::error('Gemini API request failed', ['status' => $response->status(), 'body' => $response->body(), 'attempt' => $attempt]);
+                $lastException = new \RuntimeException('Virtual try-on processing failed. Please try again.');
+                continue;
+            }
+
+            $data = $response->json();
+
+            try {
+                $imageData = $this->extractImageFromResponse($data);
+                break; // Success — exit retry loop
+            } catch (\RuntimeException $e) {
+                Log::warning("Gemini attempt {$attempt}/{$maxAttempts} failed", ['error' => $e->getMessage()]);
+                $lastException = $e;
+
+                if ($attempt < $maxAttempts) {
+                    sleep(2); // Brief pause before retry
+                }
+            }
         }
 
-        $data = $response->json();
-        $imageData = $this->extractImageFromResponse($data);
+        if (!isset($imageData)) {
+            throw $lastException ?? new \RuntimeException('Image generation failed after multiple attempts.');
+        }
 
         $filename = Str::random(20) . '.jpg';
         $path = 'tryon-results/' . $filename;
@@ -110,24 +139,45 @@ class GeminiTryOnProvider implements TryOnProviderContract
 
     private function buildSingleGarmentParts(string $modelImageBase64, array $garment, string $promptHint): array
     {
-        $garmentDescription = $promptHint
-            ? "the {$promptHint} garment"
-            : 'the garment';
-
-        $prompt = implode(' ', [
-            "Virtual try-on: Using the person in the first image as the model, dress them in {$garmentDescription} shown in the second image.",
-            'Keep the person\'s face, body shape, pose, skin tone, and hair exactly identical to the original photo.',
-            'Naturally fit the garment onto the person\'s body with realistic fabric draping, wrinkles, and shadows that match the original lighting.',
-            'Maintain the original background, environment, and lighting conditions unchanged.',
-            'The result should look like a professional studio photograph, photorealistic, with accurate garment color and texture.',
-            'Produce a single clean image with no collage, no split view, no text overlays, and no side-by-side comparison.',
-        ]);
-
-        return [
-            ['text' => $prompt],
-            ['inline_data' => ['mime_type' => 'image/jpeg', 'data' => $modelImageBase64]],
-            ['inline_data' => ['mime_type' => 'image/jpeg', 'data' => $this->prepareImage($garment['path'])]],
+        $categoryLabels = [
+            'upper' => 'top/upper body clothing',
+            'lower' => 'bottom/lower body clothing',
+            'dress' => 'full body dress',
         ];
+
+        $categoryLabel = $categoryLabels[$garment['category']] ?? 'clothing item';
+
+        $parts = [];
+
+        // Label the model image explicitly
+        $parts[] = ['text' => 'This is the model person — use their face, body, pose, and background exactly:'];
+        $parts[] = ['inline_data' => ['mime_type' => 'image/jpeg', 'data' => $modelImageBase64]];
+
+        // Label the garment image explicitly with its category
+        $parts[] = ['text' => "This is the {$categoryLabel} — the model MUST wear exactly this garment:"];
+        $parts[] = ['inline_data' => ['mime_type' => 'image/jpeg', 'data' => $this->prepareImage($garment['path'])]];
+
+        // Detailed instructions
+        $instructions = [
+            "CRITICAL: Look carefully at the garment image above. The model must be wearing THIS EXACT {$categoryLabel} in the output — same color, same pattern, same fabric, same design details.",
+            "Do NOT substitute, ignore, or alter the garment in any way.",
+        ];
+
+        if ($promptHint) {
+            $instructions[] = "Additional styling context: {$promptHint}.";
+        }
+
+        $instructions[] = 'This is a professional fashion e-commerce virtual try-on for a clothing store.';
+        $instructions[] = 'Keep the person\'s face, body shape, pose, skin tone, and hair exactly identical to the original photo.';
+        $instructions[] = 'Naturally fit the garment onto the person\'s body with realistic fabric draping, wrinkles, and shadows that match the original lighting.';
+        $instructions[] = 'Maintain the original background, environment, and lighting conditions unchanged.';
+        $instructions[] = 'The result should look like a professional studio photograph, photorealistic, with accurate garment color and texture.';
+        $instructions[] = 'Produce a single clean image with no collage, no split view, no text overlays, and no side-by-side comparison.';
+        $instructions[] = "VERIFICATION: The model must be wearing the {$categoryLabel} from the garment image. If the garment is not clearly visible on the model, the result is WRONG — redo it.";
+
+        $parts[] = ['text' => implode(' ', $instructions)];
+
+        return $parts;
     }
 
     /**
@@ -171,9 +221,10 @@ class GeminiTryOnProvider implements TryOnProviderContract
         ];
 
         if ($promptHint) {
-            $instructions[] = "Additional styling instructions: {$promptHint}.";
+            $instructions[] = "Additional styling context: {$promptHint}.";
         }
 
+        $instructions[] = 'This is a professional fashion e-commerce virtual try-on for a clothing store.';
         $instructions[] = 'Keep the person\'s face, body shape, pose, skin tone, and hair exactly identical to the original photo.';
         $instructions[] = 'Naturally fit all garments onto the person\'s body with realistic fabric draping, wrinkles, and shadows that match the original lighting.';
         $instructions[] = 'Maintain the original background, environment, and lighting conditions unchanged.';
@@ -202,7 +253,7 @@ class GeminiTryOnProvider implements TryOnProviderContract
 
         $parts = [];
 
-        $parts[] = ['text' => 'Virtual try-on task. This is the model person — use their face, body, pose, and background exactly:'];
+        $parts[] = ['text' => 'Professional fashion e-commerce virtual try-on. This is the model person — use their face, body, pose, and background exactly:'];
         $parts[] = ['inline_data' => ['mime_type' => 'image/jpeg', 'data' => $modelImageBase64]];
 
         foreach ($garments as $index => $garment) {
@@ -223,9 +274,10 @@ class GeminiTryOnProvider implements TryOnProviderContract
         ];
 
         if ($promptHint) {
-            $instructions[] = "Additional styling instructions: {$promptHint}.";
+            $instructions[] = "Additional styling context: {$promptHint}.";
         }
 
+        $instructions[] = 'This is a professional fashion e-commerce virtual try-on for a clothing store.';
         $instructions[] = 'Output exactly ONE person — the same model from the first image — wearing all the garments together.';
         $instructions[] = 'Keep the person\'s face, body shape, pose, skin tone, and hair exactly identical to the original photo.';
         $instructions[] = 'Naturally fit all garments onto the person\'s body with realistic fabric draping, wrinkles, and shadows that match the original lighting.';
@@ -252,9 +304,35 @@ class GeminiTryOnProvider implements TryOnProviderContract
 
     private function extractImageFromResponse(array $data): string
     {
+        // Check for prompt-level safety blocks
+        if (isset($data['promptFeedback']['blockReason'])) {
+            $reason = $data['promptFeedback']['blockReason'];
+            Log::warning('Gemini blocked the prompt', [
+                'blockReason' => $reason,
+                'safetyRatings' => $data['promptFeedback']['safetyRatings'] ?? [],
+            ]);
+            throw new \RuntimeException('error.safety_blocked');
+        }
+
         $candidates = $data['candidates'] ?? [];
 
         foreach ($candidates as $candidate) {
+            // Check candidate-level finish reason
+            $finishReason = $candidate['finishReason'] ?? null;
+            if ($finishReason === 'SAFETY') {
+                Log::warning('Gemini candidate blocked by safety', [
+                    'finishReason' => $finishReason,
+                    'safetyRatings' => $candidate['safetyRatings'] ?? [],
+                ]);
+                throw new \RuntimeException('error.safety_blocked');
+            }
+            if (in_array($finishReason, ['IMAGE_SAFETY', 'IMAGE_OTHER'])) {
+                Log::warning('Gemini image generation refused', [
+                    'finishReason' => $finishReason,
+                ]);
+                throw new \RuntimeException('error.content_filtered');
+            }
+
             $parts = $candidate['content']['parts'] ?? [];
             foreach ($parts as $part) {
                 if (isset($part['inlineData']['data'])) {
@@ -266,6 +344,27 @@ class GeminiTryOnProvider implements TryOnProviderContract
             }
         }
 
-        throw new \RuntimeException('No image found in Gemini response');
+        // Log the actual response for debugging
+        $textParts = [];
+        foreach ($candidates as $candidate) {
+            foreach ($candidate['content']['parts'] ?? [] as $part) {
+                if (isset($part['text'])) {
+                    $textParts[] = $part['text'];
+                }
+            }
+        }
+
+        Log::error('Gemini returned no image', [
+            'textResponse' => implode(' ', $textParts) ?: '(empty)',
+            'candidateCount' => count($candidates),
+            'finishReason' => $candidates[0]['finishReason'] ?? 'unknown',
+            'responseKeys' => array_keys($data),
+        ]);
+
+        if (!empty($textParts)) {
+            Log::warning('Gemini text response', ['text' => implode(' ', $textParts)]);
+        }
+
+        throw new \RuntimeException('error.no_image');
     }
 }

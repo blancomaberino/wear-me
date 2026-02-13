@@ -18,18 +18,28 @@ class TryOnVideoController extends Controller
     {
         $tryOnResults = $request->user()->tryonResults()
             ->where('status', ProcessingStatus::Completed)
-            ->with(['modelImage', 'garment'])
+            ->with(['modelImage', 'garment', 'garments'])
             ->latest()
             ->get()
-            ->map(fn ($r) => [
-                'id' => $r->id,
-                'result_url' => $r->result_url,
-                'model_image' => ['thumbnail_url' => $r->modelImage->thumbnail_url],
-                'garment' => [
-                    'name' => $r->garment->name ?? $r->garment->original_filename,
-                    'thumbnail_url' => $r->garment->thumbnail_url,
-                ],
-            ]);
+            ->map(function ($r) {
+                // Resolve garments: pivot table first, then legacy single garment
+                $garments = $r->garments->isNotEmpty() ? $r->garments : ($r->garment ? collect([$r->garment]) : collect());
+                $firstGarment = $garments->first();
+
+                return [
+                    'id' => $r->id,
+                    'result_url' => $r->result_url,
+                    'model_image' => ['thumbnail_url' => $r->modelImage?->thumbnail_url],
+                    'garment' => [
+                        'name' => $firstGarment
+                            ? ($garments->count() > 1
+                                ? $garments->map(fn ($g) => $g->name ?? $g->original_filename)->join(' + ')
+                                : ($firstGarment->name ?? $firstGarment->original_filename))
+                            : 'Unknown',
+                        'thumbnail_url' => $firstGarment?->thumbnail_url,
+                    ],
+                ];
+            });
 
         return Inertia::render('Videos/Index', [
             'tryOnResults' => $tryOnResults,
@@ -43,7 +53,7 @@ class TryOnVideoController extends Controller
         $video = $request->user()->tryonVideos()->create([
             'tryon_result_id' => $tryOnResult->id,
             'model_image_id' => $tryOnResult->model_image_id,
-            'garment_id' => $tryOnResult->garment_id,
+            'garment_id' => $tryOnResult->garment_id ?? $tryOnResult->garments()->first()?->id,
             'kling_task_id' => 'pending_' . Str::random(20),
             'status' => ProcessingStatus::Pending,
         ]);

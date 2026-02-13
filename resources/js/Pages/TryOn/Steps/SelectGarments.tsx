@@ -5,7 +5,7 @@ import { Button } from '@/Components/ui/Button';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Garment } from '@/types';
 import { useState } from 'react';
-import { Plus, Shirt } from 'lucide-react';
+import { Plus, Shirt, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -106,6 +106,15 @@ export default function SelectGarments({ garments, selectedTop, selectedBottom, 
                     </div>
                 </div>
             )}
+
+            {/* Content disclaimer */}
+            <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+                <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                    <p className="text-caption font-medium text-amber-800">{t('tryon.contentDisclaimerTitle')}</p>
+                    <p className="text-caption text-amber-700 mt-0.5">{t('tryon.contentDisclaimerDesc')}</p>
+                </div>
+            </div>
 
             <GarmentUploadDialog open={showUpload} onClose={() => setShowUpload(false)} />
         </div>

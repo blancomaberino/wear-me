@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Enums\GarmentCategory;
+use App\Http\Requests\BulkStoreGarmentRequest;
 use App\Http\Requests\StoreGarmentRequest;
 use App\Http\Requests\UpdateGarmentRequest;
 use App\Http\Resources\GarmentResource;
+use App\Jobs\ProcessBulkGarment;
 use App\Models\Garment;
+use App\Models\User;
 use App\Services\WardrobeService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,14 +40,14 @@ class GarmentController extends Controller
 
     public function store(StoreGarmentRequest $request)
     {
-        if ($request->user()->garments()->count() >= 200) {
-            return redirect()->back()->withErrors(['image' => 'Maximum of 200 garments allowed.']);
+        if ($request->user()->garments()->count() >= User::MAX_GARMENTS) {
+            return redirect()->back()->withErrors(['image' => __('messages.garmentLimitReached')]);
         }
 
         $this->wardrobeService->storeGarment(
             $request->user(),
             $request->only([
-                'category', 'name', 'description', 'size_label', 'brand', 'material',
+                'category', 'name', 'description', 'clothing_type', 'size_label', 'brand', 'material',
                 'measurement_chest_cm', 'measurement_length_cm', 'measurement_waist_cm',
                 'measurement_inseam_cm', 'measurement_shoulder_cm', 'measurement_sleeve_cm',
             ]),
@@ -54,12 +57,38 @@ class GarmentController extends Controller
         return redirect()->back()->with('success', __('messages.garment_uploaded'));
     }
 
+    public function bulkStore(BulkStoreGarmentRequest $request)
+    {
+        $user = $request->user();
+        $currentCount = $user->garments()->count();
+        $files = $request->file('images');
+        $maxAllowed = User::MAX_GARMENTS - $currentCount;
+
+        if ($maxAllowed <= 0) {
+            return redirect()->back()->withErrors(['images' => __('messages.garmentLimitReached')]);
+        }
+
+        $filesToProcess = array_slice($files, 0, $maxAllowed);
+
+        foreach ($filesToProcess as $file) {
+            $tempPath = $file->store('temp/bulk-uploads', 'local');
+            ProcessBulkGarment::dispatch(
+                $user,
+                $tempPath,
+                $file->getClientOriginalName(),
+                $request->input('category')
+            );
+        }
+
+        return redirect()->back()->with('success', __('messages.bulk_upload_started', ['count' => count($filesToProcess)]));
+    }
+
     public function update(UpdateGarmentRequest $request, Garment $garment)
     {
         $this->authorize('update', $garment);
 
         $garment->update($request->only([
-            'name', 'description', 'category', 'size_label', 'brand', 'material',
+            'name', 'description', 'category', 'clothing_type', 'size_label', 'brand', 'material',
             'measurement_chest_cm', 'measurement_length_cm', 'measurement_waist_cm',
             'measurement_inseam_cm', 'measurement_shoulder_cm', 'measurement_sleeve_cm',
         ]));

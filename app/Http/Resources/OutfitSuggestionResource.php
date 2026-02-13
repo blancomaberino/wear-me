@@ -17,10 +17,12 @@ class OutfitSuggestionResource extends JsonResource
                 'name' => $g->name ?? $g->original_filename,
                 'thumbnail_url' => $g->thumbnail_url,
                 'category' => $g->category->value,
+                'color_tags' => $g->color_tags,
             ]),
             'suggestion_text' => $this->suggestion_text,
             'occasion' => $this->occasion,
             'is_saved' => $this->is_saved,
+            'harmony_score' => $this->harmony_score,
             'created_at' => $this->created_at->diffForHumans(),
         ];
     }

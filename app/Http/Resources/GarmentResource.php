@@ -16,6 +16,7 @@ class GarmentResource extends JsonResource
             'original_filename' => $this->original_filename,
             'name' => $this->name,
             'category' => $this->category->value,
+            'clothing_type' => $this->clothing_type,
             'description' => $this->description,
             'color_tags' => $this->color_tags,
             'size_label' => $this->size_label,

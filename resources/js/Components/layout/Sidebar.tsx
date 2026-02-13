@@ -7,7 +7,11 @@ import {
     Camera,
     Shirt,
     Wand2,
+    History,
     Sparkles,
+    BookOpen,
+    Video,
+    Luggage,
     User,
     LogOut,
     ChevronDown,
@@ -30,7 +34,11 @@ function Sidebar({ className }: SidebarProps) {
         { name: t('nav.myPhotos'), route: 'model-images.index', icon: Camera },
         { name: t('nav.wardrobe'), route: 'wardrobe.index', icon: Shirt },
         { name: t('nav.tryOn'), route: 'tryon.index', icon: Wand2 },
+        { name: t('nav.history'), route: 'tryon.history', icon: History },
         { name: t('nav.outfits'), route: 'outfits.index', icon: Sparkles },
+        { name: t('nav.lookbooks'), route: 'lookbooks.index', icon: BookOpen },
+        { name: t('nav.videos'), route: 'videos.index', icon: Video },
+        { name: t('nav.packing'), route: 'packing-lists.index', icon: Luggage },
     ];
 
     return (
@@ -44,9 +52,7 @@ function Sidebar({ className }: SidebarProps) {
             {/* Logo */}
             <div className="flex items-center gap-2.5 px-6 h-16 border-b border-surface-100">
                 <Link href="/" className="flex items-center gap-2.5">
-                    <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-brand-600">
-                        <Shirt className="h-5 w-5 text-white" />
-                    </div>
+                    <img src="/icons/logo.png" alt="WearMe" className="h-9 w-9" />
                     <span className="text-heading-sm text-surface-900">{t('nav.brandName')}</span>
                 </Link>
             </div>
@@ -54,7 +60,9 @@ function Sidebar({ className }: SidebarProps) {
             {/* Navigation */}
             <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
                 {navItems.map((item) => {
-                    const isActive = route().current(item.route) || route().current(item.route.replace('.index', '.*'));
+                    const wildcardMatch = route().current(item.route.replace('.index', '.*'));
+                    const exactMatchExists = wildcardMatch && navItems.some(other => other.route !== item.route && route().current(other.route));
+                    const isActive = route().current(item.route) || (wildcardMatch && !exactMatchExists);
                     return (
                         <Link
                             key={item.route}

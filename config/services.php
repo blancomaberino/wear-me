@@ -45,6 +45,7 @@ return [
         'access_key' => env('KLING_ACCESS_KEY'),
         'secret_key' => env('KLING_SECRET_KEY'),
         'base_url' => env('KLING_BASE_URL', 'https://api.klingai.com'),
+        'tryon_model' => env('KLING_TRYON_MODEL', 'kolors-virtual-try-on-v1-5'),
     ],
 
     'tryon' => [

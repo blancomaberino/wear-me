@@ -21,11 +21,11 @@ class TryOnResultResource extends JsonResource
             'created_at' => $this->created_at->diffForHumans(),
             'model_image' => [
                 'url' => $this->source_tryon_result_id
-                    ? $this->sourceResult->result_url
-                    : $this->modelImage->url,
+                    ? $this->sourceResult?->result_url
+                    : $this->modelImage?->url,
                 'thumbnail_url' => $this->source_tryon_result_id
-                    ? $this->sourceResult->result_url
-                    : $this->modelImage->thumbnail_url,
+                    ? $this->sourceResult?->result_url
+                    : $this->modelImage?->thumbnail_url,
             ],
             'garment' => $firstGarment ? [
                 'name' => $firstGarment->name ?? $firstGarment->original_filename,

@@ -4,7 +4,7 @@ import FlashMessages from '@/Components/FlashMessages';
 import { Avatar } from '@/Components/ui/Avatar';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
-import { Shirt } from 'lucide-react';
+
 import { useTranslation } from 'react-i18next';
 
 export default function Authenticated({ children }: PropsWithChildren) {
@@ -27,9 +27,7 @@ export default function Authenticated({ children }: PropsWithChildren) {
             <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-surface-200">
                 <div className="flex items-center justify-between h-14 px-4">
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-brand-600">
-                            <Shirt className="h-4 w-4 text-white" />
-                        </div>
+                        <img src="/icons/logo.png" alt="WearMe" className="h-8 w-8" />
                         <span className="text-heading-sm text-surface-900">{t('nav.brandName')}</span>
                     </Link>
                     <Link href={route('profile.edit')}>

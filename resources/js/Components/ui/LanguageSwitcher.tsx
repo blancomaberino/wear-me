@@ -1,5 +1,6 @@
 import { router, usePage } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
+import i18n from '@/i18n';
 
 const locales = [
   { code: 'en', label: 'EN', flag: '🇺🇸' },
@@ -16,8 +17,11 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
 
   const handleSwitch = (newLocale: string) => {
     if (newLocale === currentLocale) return;
+    // Change language immediately on the client for instant feedback
+    i18n.changeLanguage(newLocale);
+    // Persist to server
     router.post(route('locale.update'), { locale: newLocale }, {
-      preserveState: false,
+      preserveState: true,
       preserveScroll: true,
     });
   };

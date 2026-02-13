@@ -10,6 +10,11 @@ import outfits from './outfits';
 import welcome from './welcome';
 import processing from './processing';
 import videos from './videos';
+import importNs from './import';
+import lookbooks from './lookbooks';
+import share from './share';
+import packing from './packing';
+import exportNs from './export';
 
 const es = {
   ...Object.fromEntries(Object.entries(common).map(([k, v]) => [`common.${k}`, v])),
@@ -24,6 +29,11 @@ const es = {
   ...Object.fromEntries(Object.entries(welcome).map(([k, v]) => [`welcome.${k}`, v])),
   ...Object.fromEntries(Object.entries(processing).map(([k, v]) => [`processing.${k}`, v])),
   ...Object.fromEntries(Object.entries(videos).map(([k, v]) => [`videos.${k}`, v])),
+  ...Object.fromEntries(Object.entries(importNs).map(([k, v]) => [`import.${k}`, v])),
+  ...Object.fromEntries(Object.entries(lookbooks).map(([k, v]) => [`lookbooks.${k}`, v])),
+  ...Object.fromEntries(Object.entries(share).map(([k, v]) => [`share.${k}`, v])),
+  ...Object.fromEntries(Object.entries(packing).map(([k, v]) => [`packing.${k}`, v])),
+  ...Object.fromEntries(Object.entries(exportNs).map(([k, v]) => [`export.${k}`, v])),
 };
 
 export default es;

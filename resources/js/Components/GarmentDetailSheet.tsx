@@ -4,7 +4,7 @@ import { Input } from '@/Components/ui/Input';
 import { Badge } from '@/Components/ui/Badge';
 import { Garment } from '@/types';
 import { useForm, router } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useState, useEffect } from 'react';
 import { Trash2, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,18 +18,27 @@ export default function GarmentDetailSheet({ garment, open, onClose }: Props) {
     const { t } = useTranslation();
     const [confirmDelete, setConfirmDelete] = useState(false);
 
-    const { data, setData, patch, processing } = useForm({
-        name: garment?.name || '',
-        brand: garment?.brand || '',
-        material: garment?.material || '',
-        size_label: garment?.size_label || '',
-        measurement_chest_cm: garment?.measurement_chest_cm ?? '',
-        measurement_length_cm: garment?.measurement_length_cm ?? '',
-        measurement_waist_cm: garment?.measurement_waist_cm ?? '',
-        measurement_inseam_cm: garment?.measurement_inseam_cm ?? '',
-        measurement_shoulder_cm: garment?.measurement_shoulder_cm ?? '',
-        measurement_sleeve_cm: garment?.measurement_sleeve_cm ?? '',
+    const buildFormData = (g: Garment | null) => ({
+        name: g?.name || '',
+        brand: g?.brand || '',
+        material: g?.material || '',
+        size_label: g?.size_label || '',
+        measurement_chest_cm: g?.measurement_chest_cm ?? '',
+        measurement_length_cm: g?.measurement_length_cm ?? '',
+        measurement_waist_cm: g?.measurement_waist_cm ?? '',
+        measurement_inseam_cm: g?.measurement_inseam_cm ?? '',
+        measurement_shoulder_cm: g?.measurement_shoulder_cm ?? '',
+        measurement_sleeve_cm: g?.measurement_sleeve_cm ?? '',
     });
+
+    const { data, setData, patch, processing, setDefaults, reset } = useForm(buildFormData(garment));
+
+    useEffect(() => {
+        if (garment) {
+            setDefaults(buildFormData(garment));
+            reset();
+        }
+    }, [garment?.id]);
 
     if (!garment) return null;
 

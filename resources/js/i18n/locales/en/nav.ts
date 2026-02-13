@@ -13,4 +13,7 @@ export default {
   brandName: 'WearMe',
   skipToContent: 'Skip to content',
   poweredByAi: 'Virtual try-on powered by AI',
+  lookbooks: 'Lookbooks',
+  packing: 'Packing',
+  videos: 'Videos',
 };

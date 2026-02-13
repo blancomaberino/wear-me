@@ -217,4 +217,95 @@ class GarmentTest extends TestCase
             'category' => 'dress',
         ]);
     }
+
+    public function test_user_can_upload_garment_with_clothing_type(): void
+    {
+        $user = User::factory()->create();
+
+        $this->mock(ImageProcessingService::class, function ($mock) {
+            $mock->shouldReceive('processAndStore')
+                ->once()
+                ->andReturn([
+                    'path' => 'garments/test.jpg',
+                    'thumbnail_path' => 'garments/thumbnails/thumb_test.jpg',
+                    'width' => 600,
+                    'height' => 800,
+                    'size_bytes' => 300000,
+                    'original_filename' => 'shirt.jpg',
+                ]);
+        });
+
+        $this->actingAs($user)
+            ->post(route('wardrobe.store'), [
+                'image' => UploadedFile::fake()->image('shirt.jpg'),
+                'category' => 'upper',
+                'clothing_type' => 'sweater',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('garments', [
+            'user_id' => $user->id,
+            'category' => 'upper',
+            'clothing_type' => 'sweater',
+        ]);
+    }
+
+    public function test_clothing_type_is_optional(): void
+    {
+        $user = User::factory()->create();
+
+        $this->mock(ImageProcessingService::class, function ($mock) {
+            $mock->shouldReceive('processAndStore')
+                ->once()
+                ->andReturn([
+                    'path' => 'garments/test.jpg',
+                    'thumbnail_path' => 'garments/thumbnails/thumb_test.jpg',
+                    'width' => 600,
+                    'height' => 800,
+                    'size_bytes' => 300000,
+                    'original_filename' => 'shirt.jpg',
+                ]);
+        });
+
+        $this->actingAs($user)
+            ->post(route('wardrobe.store'), [
+                'image' => UploadedFile::fake()->image('shirt.jpg'),
+                'category' => 'upper',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $garment = $user->garments()->first();
+        $this->assertNull($garment->clothing_type);
+    }
+
+    public function test_clothing_type_max_length_validation(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('wardrobe.store'), [
+                'image' => UploadedFile::fake()->image('shirt.jpg'),
+                'category' => 'upper',
+                'clothing_type' => str_repeat('a', 51),
+            ])
+            ->assertSessionHasErrors('clothing_type');
+    }
+
+    public function test_garment_resource_includes_clothing_type(): void
+    {
+        $user = User::factory()->create();
+        Garment::factory()->for($user)->create([
+            'clothing_type' => 'jacket',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('wardrobe.index'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->has('garments', 1)
+                ->where('garments.0.clothing_type', 'jacket')
+            );
+    }
 }

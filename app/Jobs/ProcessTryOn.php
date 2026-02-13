@@ -98,7 +98,7 @@ class ProcessTryOn implements ShouldQueue
             Log::error('ProcessTryOn failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             $this->tryOnResult->update([
                 'status' => ProcessingStatus::Failed,
-                'error_message' => 'Try-on processing failed. Please try again.',
+                'error_message' => str_starts_with($e->getMessage(), 'error.') ? $e->getMessage() : 'error.generic',
             ]);
         }
     }

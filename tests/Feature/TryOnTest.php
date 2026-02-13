@@ -133,7 +133,8 @@ class TryOnTest extends TestCase
                 'model_image_id' => 999,
                 'garment_ids' => [999],
             ])
-            ->assertStatus(404);
+            ->assertRedirect()
+            ->assertSessionHasErrors(['model_image_id', 'garment_ids.0']);
     }
 
     public function test_user_cannot_use_other_users_model_image(): void

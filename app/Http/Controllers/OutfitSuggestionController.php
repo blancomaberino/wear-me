@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\GenerateOutfitRequest;
 use App\Http\Resources\OutfitSuggestionResource;
 use App\Jobs\GenerateOutfitSuggestion;
+use App\Models\Lookbook;
 use App\Models\OutfitSuggestion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,11 +17,13 @@ class OutfitSuggestionController extends Controller
         $suggestions = $request->user()
             ->outfitSuggestions()
             ->latest()
-            ->paginate(10);
+            ->limit(50)
+            ->get();
 
         return Inertia::render('Outfits/Suggestions', [
             'suggestions' => OutfitSuggestionResource::collection($suggestions),
             'garmentCount' => $request->user()->garments()->count(),
+            'lookbooks' => $request->user()->lookbooks()->withCount('items')->get(),
         ]);
     }
 
@@ -46,10 +49,12 @@ class OutfitSuggestionController extends Controller
             ->outfitSuggestions()
             ->where('is_saved', true)
             ->latest()
+            ->limit(50)
             ->get();
 
         return Inertia::render('Outfits/Saved', [
             'suggestions' => OutfitSuggestionResource::collection($suggestions),
+            'lookbooks' => $request->user()->lookbooks()->withCount('items')->get(),
         ]);
     }
 }

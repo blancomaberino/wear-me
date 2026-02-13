@@ -4,20 +4,25 @@ import ProcessingStatus from '@/Components/ProcessingStatus';
 import { Button } from '@/Components/ui/Button';
 import { Card, CardBody } from '@/Components/ui/Card';
 import { Head, Link, router } from '@inertiajs/react';
-import { TryOnResult } from '@/types';
+import { TryOnResult, Lookbook } from '@/types';
 import { usePolling } from '@/hooks/usePolling';
-import { useState } from 'react';
-import { Heart, Download, Share2, Layers, Wand2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Heart, Download, Share2, Layers, Wand2, BookOpen, ZoomIn } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import AddToLookbookDialog from '@/Components/AddToLookbookDialog';
+import ImageLightbox from '@/Components/ImageLightbox';
 
 interface Props {
     tryOnResult: TryOnResult;
+    lookbooks: Lookbook[];
 }
 
-export default function Result({ tryOnResult: initial }: Props) {
+export default function Result({ tryOnResult: initial, lookbooks }: Props) {
     const { t } = useTranslation();
     const [result, setResult] = useState(initial);
+    useEffect(() => { setResult(initial); }, [initial]);
     const [copied, setCopied] = useState(false);
+    const [showAddToLookbook, setShowAddToLookbook] = useState(false);
 
     usePolling({
         url: route('tryon.status', result.id),
@@ -52,8 +57,10 @@ export default function Result({ tryOnResult: initial }: Props) {
             <Head title={t('tryon.resultTitle')} />
             <PageHeader title={t('tryon.resultTitle')} />
 
-            <div className="max-w-4xl mx-auto">
-                <ProcessingStatus status={result.status} errorMessage={result.error_message} className="mb-6" />
+            <div className="max-w-5xl mx-auto">
+                {result.status !== 'completed' && (
+                    <ProcessingStatus status={result.status} errorMessage={result.error_message} className="mb-6" />
+                )}
 
                 {/* Processing skeleton */}
                 {(result.status === 'pending' || result.status === 'processing') && (
@@ -64,78 +71,137 @@ export default function Result({ tryOnResult: initial }: Props) {
                     </div>
                 )}
 
-                {/* Result image */}
+                {/* Completed result — side-by-side layout */}
                 {result.status === 'completed' && result.result_url && (
-                    <Card className="overflow-hidden animate-fade-in">
-                        <img src={result.result_url} alt={t('tryon.tryOnResult')} className="w-full" />
-                        <CardBody>
-                            <div className="flex flex-wrap items-center gap-3">
-                                <Button
-                                    variant={result.is_favorite ? 'primary' : 'outline'}
-                                    size="sm"
-                                    onClick={() => router.patch(route('tryon.favorite', result.id))}
-                                >
-                                    <Heart className={`h-4 w-4 ${result.is_favorite ? 'fill-current' : ''}`} />
-                                    {result.is_favorite ? t('tryon.favorited') : t('tryon.favorite')}
-                                </Button>
-                                <Button variant="outline" size="sm" onClick={handleDownload}>
-                                    <Download className="h-4 w-4" /> {t('tryon.download')}
-                                </Button>
-                                <Button variant="outline" size="sm" onClick={handleShare}>
-                                    <Share2 className="h-4 w-4" /> {copied ? t('tryon.copied') : t('tryon.share')}
-                                </Button>
-                                <Link href={route('tryon.index', { source_result: result.id })}>
-                                    <Button variant="outline" size="sm">
-                                        <Layers className="h-4 w-4" /> {t('tryon.tryOnMore')}
-                                    </Button>
-                                </Link>
-                                <span className="ml-auto text-caption text-surface-400">{result.created_at}</span>
-                            </div>
-                        </CardBody>
-                    </Card>
-                )}
+                    <div className="flex flex-col md:flex-row gap-6 animate-fade-in">
+                        {/* Result image — hero */}
+                        <div className="flex-1 min-w-0">
+                            <ImageLightbox src={result.result_url!} alt={t('tryon.tryOnResult')}>
+                                {(open) => (
+                                    <Card className="overflow-hidden cursor-zoom-in group" onClick={open}>
+                                        <div className="bg-surface-50 flex items-center justify-center relative">
+                                            <img
+                                                src={result.result_url!}
+                                                alt={t('tryon.tryOnResult')}
+                                                className="w-full max-h-[70vh] object-contain"
+                                            />
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center">
+                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-full p-2">
+                                                    <ZoomIn className="h-5 w-5 text-white" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                )}
+                            </ImageLightbox>
+                        </div>
 
-                {/* Source images */}
-                <div className="mt-6">
-                    <h3 className="text-heading-sm text-surface-700 mb-3">{t('tryon.sourceImages')}</h3>
-                    <div className={`grid gap-4 ${(result.garments?.length ?? 1) > 1 ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-2'}`}>
-                        <Card>
-                            <CardBody>
-                                <p className="text-caption font-medium text-surface-500 mb-2">{t('tryon.yourPhoto')}</p>
-                                {result.model_image.url && <img src={result.model_image.url} alt="Model" className="rounded-lg w-full" />}
-                            </CardBody>
-                        </Card>
-                        {result.garments && result.garments.length > 0 ? (
-                            result.garments.map((g) => (
-                                <Card key={g.id}>
-                                    <CardBody>
-                                        <p className="text-caption font-medium text-surface-500 mb-2">{g.name}</p>
-                                        {g.url && <img src={g.url} alt={g.name} className="rounded-lg w-full" />}
-                                    </CardBody>
-                                </Card>
-                            ))
-                        ) : result.garment && (
+                        {/* Sidebar — actions + source images */}
+                        <div className="w-full md:w-72 lg:w-80 flex-shrink-0 space-y-5">
+                            {/* Actions */}
                             <Card>
-                                <CardBody>
-                                    <p className="text-caption font-medium text-surface-500 mb-2">{result.garment.name}</p>
-                                    {result.garment.url && <img src={result.garment.url} alt="Garment" className="rounded-lg w-full" />}
+                                <CardBody className="space-y-2">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Button
+                                            variant={result.is_favorite ? 'primary' : 'outline'}
+                                            size="sm"
+                                            className="w-full"
+                                            onClick={() => router.patch(route('tryon.favorite', result.id))}
+                                        >
+                                            <Heart className={`h-4 w-4 flex-shrink-0 ${result.is_favorite ? 'fill-current' : ''}`} />
+                                            <span className="truncate">{result.is_favorite ? t('tryon.favorited') : t('tryon.favorite')}</span>
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="w-full" onClick={handleDownload}>
+                                            <Download className="h-4 w-4 flex-shrink-0" /> <span className="truncate">{t('tryon.download')}</span>
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="w-full" onClick={handleShare}>
+                                            <Share2 className="h-4 w-4 flex-shrink-0" /> <span className="truncate">{copied ? t('tryon.copied') : t('tryon.share')}</span>
+                                        </Button>
+                                    </div>
+                                    <Button variant="outline" size="sm" className="w-full" onClick={() => setShowAddToLookbook(true)}>
+                                        <BookOpen className="h-4 w-4 flex-shrink-0" /> {t('lookbooks.addItem')}
+                                    </Button>
+                                    <Link href={route('tryon.index', { source_result: result.id })} className="block">
+                                        <Button variant="outline" size="sm" className="w-full">
+                                            <Layers className="h-4 w-4 flex-shrink-0" /> {t('tryon.tryOnMore')}
+                                        </Button>
+                                    </Link>
+                                    <p className="text-caption text-surface-400 text-center pt-1">{result.created_at}</p>
                                 </CardBody>
                             </Card>
-                        )}
-                    </div>
-                </div>
 
-                {/* Try another */}
-                {result.status === 'completed' && (
-                    <div className="mt-8 text-center">
-                        <Link href={route('tryon.index')}>
-                            <Button variant="secondary" size="lg">
-                                <Wand2 className="h-5 w-5" /> {t('tryon.tryAnother')}
-                            </Button>
-                        </Link>
+                            {/* Source images — compact thumbnails */}
+                            <div>
+                                <h3 className="text-caption font-semibold text-surface-500 uppercase tracking-wider mb-3">{t('tryon.sourceImages')}</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        {result.model_image.url ? (
+                                            <ImageLightbox src={result.model_image.url} alt="Model">
+                                                {(open) => (
+                                                    <div className="rounded-lg overflow-hidden bg-surface-50 aspect-[3/4] cursor-zoom-in" onClick={open}>
+                                                        <img src={result.model_image.url} alt="Model" className="w-full h-full object-cover" />
+                                                    </div>
+                                                )}
+                                            </ImageLightbox>
+                                        ) : (
+                                            <div className="rounded-lg overflow-hidden bg-surface-50 aspect-[3/4]" />
+                                        )}
+                                        <p className="text-caption text-surface-500 mt-1.5 truncate">{t('tryon.yourPhoto')}</p>
+                                    </div>
+                                    {result.garments && result.garments.length > 0 ? (
+                                        result.garments.map((g) => (
+                                            <div key={g.id}>
+                                                {g.url ? (
+                                                    <ImageLightbox src={g.url} alt={g.name}>
+                                                        {(open) => (
+                                                            <div className="rounded-lg overflow-hidden bg-surface-50 aspect-[3/4] cursor-zoom-in" onClick={open}>
+                                                                <img src={g.url} alt={g.name} className="w-full h-full object-cover" />
+                                                            </div>
+                                                        )}
+                                                    </ImageLightbox>
+                                                ) : (
+                                                    <div className="rounded-lg overflow-hidden bg-surface-50 aspect-[3/4]" />
+                                                )}
+                                                <p className="text-caption text-surface-500 mt-1.5 truncate">{g.name}</p>
+                                            </div>
+                                        ))
+                                    ) : result.garment && (
+                                        <div>
+                                            {result.garment!.url ? (
+                                                <ImageLightbox src={result.garment!.url} alt="Garment">
+                                                    {(open) => (
+                                                        <div className="rounded-lg overflow-hidden bg-surface-50 aspect-[3/4] cursor-zoom-in" onClick={open}>
+                                                            <img src={result.garment!.url!} alt="Garment" className="w-full h-full object-cover" />
+                                                        </div>
+                                                    )}
+                                                </ImageLightbox>
+                                            ) : (
+                                                <div className="rounded-lg overflow-hidden bg-surface-50 aspect-[3/4]" />
+                                            )}
+                                            <p className="text-caption text-surface-500 mt-1.5 truncate">{result.garment.name}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Try another */}
+                            <Link href={route('tryon.index')} className="block">
+                                <Button variant="secondary" size="lg" className="w-full">
+                                    <Wand2 className="h-5 w-5" /> {t('tryon.tryAnother')}
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 )}
             </div>
+
+            <AddToLookbookDialog
+                open={showAddToLookbook}
+                onClose={() => setShowAddToLookbook(false)}
+                lookbooks={lookbooks}
+                itemableType="tryon_result"
+                itemableId={result.id}
+            />
         </AuthenticatedLayout>
     );
 }

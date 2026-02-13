@@ -75,4 +75,7 @@ export default {
   page: 'Page {{current}} of {{last}}',
   tryOnResult: 'Try-on result',
   takePhoto: 'Take Photo',
+  chipOther: 'Other...',
+  contentDisclaimerTitle: 'Content guidelines',
+  contentDisclaimerDesc: 'The AI may not generate results for revealing clothing such as swimwear, bikinis, lingerie, or similar items. For best results, use everyday clothing like shirts, pants, dresses, and jackets.',
 };

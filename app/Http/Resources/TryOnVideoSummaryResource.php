@@ -16,8 +16,8 @@ class TryOnVideoSummaryResource extends JsonResource
             'duration_seconds' => $this->duration_seconds,
             'created_at' => $this->created_at->diffForHumans(),
             'garment' => [
-                'name' => $this->garment->name ?? $this->garment->original_filename,
-                'thumbnail_url' => $this->garment->thumbnail_url,
+                'name' => $this->garment?->name ?? $this->garment?->original_filename ?? 'Try-on',
+                'thumbnail_url' => $this->garment?->thumbnail_url,
             ],
         ];
     }

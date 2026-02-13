@@ -166,7 +166,7 @@ class TryOnProviderE2ETest extends TestCase
         $tryOnResult->refresh();
 
         $this->assertEquals(ProcessingStatus::Failed, $tryOnResult->status);
-        $this->assertStringContainsString('Try-on processing failed', $tryOnResult->error_message);
+        $this->assertStringStartsWith('error.', $tryOnResult->error_message);
     }
 
     public function test_gemini_flow_marks_failed_on_empty_response(): void
@@ -216,7 +216,7 @@ class TryOnProviderE2ETest extends TestCase
         $tryOnResult->refresh();
 
         $this->assertEquals(ProcessingStatus::Failed, $tryOnResult->status);
-        $this->assertStringContainsString('Try-on processing failed', $tryOnResult->error_message);
+        $this->assertStringStartsWith('error.', $tryOnResult->error_message);
     }
 
     // ─── Full HTTP E2E (store endpoint → job) ───────────────────

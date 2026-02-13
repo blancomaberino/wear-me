@@ -19,6 +19,9 @@ function MobileBottomNav() {
 
     const moreItems = [
         { name: t('nav.outfits'), route: 'outfits.index' },
+        { name: t('nav.lookbooks'), route: 'lookbooks.index' },
+        { name: t('nav.videos'), route: 'videos.index' },
+        { name: t('nav.packing'), route: 'packing-lists.index' },
         { name: t('nav.history'), route: 'tryon.history' },
         { name: t('nav.profile'), route: 'profile.edit' },
     ];
