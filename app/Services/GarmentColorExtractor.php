@@ -129,13 +129,15 @@ class GarmentColorExtractor
 
         $mimeType = $imageInfo['mime'];
 
-        return match ($mimeType) {
+        $image = match ($mimeType) {
             'image/jpeg' => @imagecreatefromjpeg($fullPath),
             'image/png' => @imagecreatefrompng($fullPath),
             'image/webp' => @imagecreatefromwebp($fullPath),
             'image/gif' => @imagecreatefromgif($fullPath),
             default => null,
         };
+
+        return $image ?: null;
     }
 
     /**
