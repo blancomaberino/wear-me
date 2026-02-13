@@ -61,7 +61,7 @@ Full support for English and Spanish with 17 translation namespaces covering all
 - **Gemini** - Alternative AI provider (optional)
 
 ### Development & Testing
-- **PHPUnit** - 321 feature and unit tests
+- **PHPUnit** - 334 feature and unit tests
 - **Playwright** - End-to-end testing
 - **Docker DevContainer** - Containerized development environment (PHP 8.3-FPM, MySQL 8.0, Redis 7, Mailpit)
 
@@ -172,7 +172,7 @@ npm run dev
 # Build for production
 npm run build
 
-# Run PHP tests (321 tests)
+# Run PHP tests (334 tests)
 php artisan test
 
 # Run E2E tests
@@ -195,7 +195,7 @@ php artisan pail
 
 The application includes comprehensive test coverage:
 
-- **321 PHPUnit tests** - Feature and unit tests covering all major functionality
+- **334 PHPUnit tests** - Feature and unit tests covering all major functionality
 - **28 feature test files** - Controllers, services, jobs, and policies
 - **4 unit test files** - Core business logic
 - **Playwright E2E tests** - Full user journey testing
