@@ -74,4 +74,10 @@ export default {
   typeSundress: 'Sundress',
   typeJumpsuit: 'Jumpsuit',
   typeOther: 'Other',
+  noColors: 'No colors detected',
+  addColor: 'Add color',
+  colorsDetected: 'Colors detected',
+  maxColors: 'Maximum 10 colors',
+  detectColors: 'Detect Colors',
+  detectingColors: 'Detecting colors...',
 };

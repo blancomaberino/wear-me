@@ -74,4 +74,10 @@ export default {
   typeSundress: 'Vestido de verano',
   typeJumpsuit: 'Enterizo',
   typeOther: 'Otro',
+  noColors: 'No se detectaron colores',
+  addColor: 'Agregar color',
+  colorsDetected: 'Colores detectados',
+  maxColors: 'Máximo 10 colores',
+  detectColors: 'Detectar colores',
+  detectingColors: 'Detectando colores...',
 };

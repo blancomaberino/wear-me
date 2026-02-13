@@ -47,6 +47,21 @@ export default function GarmentCard({ garment, selected, onClick, className }: P
                         <span className="text-[10px] text-white/70 truncate">{garment.brand}</span>
                     )}
                 </div>
+                {garment.color_tags && garment.color_tags.length > 0 && (
+                    <div className="flex items-center gap-1 mt-1">
+                        {garment.color_tags.slice(0, 4).map((color, i) => (
+                            <div
+                                key={i}
+                                className="w-2.5 h-2.5 rounded-full border border-white/30"
+                                style={{ backgroundColor: color.hex }}
+                                title={color.name}
+                            />
+                        ))}
+                        {garment.color_tags.length > 4 && (
+                            <span className="text-[9px] text-white/60">+{garment.color_tags.length - 4}</span>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

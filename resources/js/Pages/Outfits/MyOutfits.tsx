@@ -68,7 +68,7 @@ export default function MyOutfits({ outfits }: Props) {
                                     </div>
                                     {outfit.harmony_score != null && (
                                         <HarmonyBadge
-                                            colors={outfit.garments?.flatMap((g) => g.color_tags || []) || []}
+                                            colors={outfit.garments?.flatMap((g) => (g.color_tags || []).map((c: any) => typeof c === 'string' ? c : c.name)) || []}
                                             score={outfit.harmony_score}
                                             showLabel={false}
                                         />

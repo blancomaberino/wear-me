@@ -18,7 +18,7 @@ class OutfitSuggestionService
         }
 
         $garmentList = $garments->map(function (Garment $garment) {
-            $colors = $garment->color_tags ? implode(', ', $garment->color_tags) : 'unknown colors';
+            $colors = $garment->color_tags ? implode(', ', array_map(fn($c) => is_array($c) ? $c['name'] : $c, $garment->color_tags)) : 'unknown colors';
             $name = $garment->name ?? $garment->original_filename;
             return "- ID:{$garment->id} | {$name} | Category: {$garment->category->value} | Colors: {$colors} | {$garment->description}";
         })->implode("\n");

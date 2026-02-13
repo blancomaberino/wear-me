@@ -12,6 +12,7 @@ class WardrobeService
     public function __construct(
         private ImageProcessingService $imageService,
         private DuplicateDetectionService $duplicateService,
+        private GarmentColorExtractor $colorExtractor,
     ) {}
 
     public function storeGarment(User $user, array $data, UploadedFile $image): Garment
@@ -26,6 +27,16 @@ class WardrobeService
             $garment->update(['perceptual_hash' => $hash]);
         } catch (\Throwable $e) {
             // Non-critical: don't fail the upload if hash computation fails
+        }
+
+        // Auto-detect garment colors
+        try {
+            $colors = $this->colorExtractor->extract($garment->path);
+            if (!empty($colors)) {
+                $garment->update(['color_tags' => $colors]);
+            }
+        } catch (\Throwable $e) {
+            // Non-critical: don't fail the upload if color detection fails
         }
 
         return $garment;
