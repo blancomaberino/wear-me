@@ -112,11 +112,7 @@ class GarmentController extends Controller
         $user = $request->user();
 
         $pendingCount = $user->garments()
-            ->where(function ($query) {
-                $query->whereNull('color_tags')
-                    ->orWhere('color_tags', '[]')
-                    ->orWhere('color_tags', 'null');
-            })
+            ->missingColorTags()
             ->count();
 
         if ($pendingCount === 0) {

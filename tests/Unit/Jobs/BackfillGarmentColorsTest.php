@@ -63,10 +63,12 @@ class BackfillGarmentColorsTest extends TestCase
         $this->mock(GarmentColorExtractor::class, function ($mock) {
             $mock->shouldReceive('extract')
                 ->once()
+                ->ordered()
                 ->andThrow(new \Exception('Extraction failed'));
 
             $mock->shouldReceive('extract')
                 ->once()
+                ->ordered()
                 ->andReturn([['hex' => '#00FF00', 'name' => 'Green']]);
         });
 

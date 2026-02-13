@@ -116,7 +116,7 @@ export default function Suggestions({ suggestions, garmentCount, lookbooks }: Pr
 
                                 {suggestion.garments.length >= 2 && (
                                     <HarmonyBadge
-                                        colors={suggestion.garments.flatMap((g) => (g.color_tags || []).map((c: any) => typeof c === 'string' ? c : c.name))}
+                                        colors={suggestion.garments.flatMap((g) => (g.color_tags || []).map((c: any) => typeof c === 'string' ? c : c.hex))}
                                         score={suggestion.harmony_score}
                                         className="mb-3"
                                     />

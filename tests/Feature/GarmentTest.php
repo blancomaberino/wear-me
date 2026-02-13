@@ -356,7 +356,7 @@ class GarmentTest extends TestCase
 
         $colorTags = [];
         for ($i = 0; $i < 11; $i++) {
-            $colorTags[] = ['hex' => '#FF0000', 'name' => "Color $i"];
+            $colorTags[] = ['hex' => sprintf('#%02X%02X00', $i * 20, 100), 'name' => 'Red'];
         }
 
         $this->actingAs($user)

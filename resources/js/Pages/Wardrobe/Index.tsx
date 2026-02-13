@@ -65,7 +65,7 @@ export default function Index({ garments, currentCategory }: Props) {
                 description={t('wardrobe.count', { count: garments.length })}
                 actions={
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={handleDetectColors} disabled={detectingColors}>
+                        <Button variant="outline" size="sm" onClick={handleDetectColors} disabled={detectingColors || garments.length === 0}>
                             <Palette className="h-4 w-4" /> {detectingColors ? t('wardrobe.detectingColors') : t('wardrobe.detectColors')}
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => setShowImportUrl(true)}>

@@ -90,27 +90,22 @@ class GarmentColorExtractorTest extends TestCase
 
     public function test_returns_max_five_colors(): void
     {
-        // Create a complex multi-color image
-        $filename = $this->createMultiColorImage(200, 200, 'complex.jpg');
-
+        $filename = $this->createManyColorsImage(300, 300, 'many-colors.jpg');
         $result = $this->extractor->extract($filename);
-
-        $this->assertLessThanOrEqual(5, count($result), 'Should return at most 5 colors');
+        $this->assertNotEmpty($result);
+        $this->assertLessThanOrEqual(5, count($result));
     }
 
     public function test_filters_white_background(): void
     {
-        // Create image with 90% white and small red square
         $filename = $this->createImageWithWhiteBackground(200, 200, 'white-bg.jpg');
 
         $result = $this->extractor->extract($filename);
 
-        // Should detect red, not white
-        if (!empty($result)) {
-            $colorNames = array_column($result, 'name');
-            $this->assertNotContains('White', $colorNames, 'Should filter out white background');
-            $this->assertNotContains('Off-White', $colorNames, 'Should filter out white background');
-        }
+        $this->assertNotEmpty($result, 'Should detect colors from image with white background');
+        $names = array_column($result, 'name');
+        $this->assertNotContains('White', $names, 'White background should be filtered out');
+        $this->assertNotContains('Off-White', $names, 'Off-White background should be filtered out');
     }
 
     public function test_result_structure_has_hex_and_name(): void
@@ -146,7 +141,7 @@ class GarmentColorExtractorTest extends TestCase
 
     public function test_handles_png_format(): void
     {
-        $filename = $this->createTestImagePng(200, 200, [0, 255, 0], 'green.png');
+        $filename = $this->createTestImage(200, 200, [0, 255, 0], 'green.png', 'png');
 
         $result = $this->extractor->extract($filename);
 
@@ -180,9 +175,9 @@ class GarmentColorExtractorTest extends TestCase
     }
 
     /**
-     * Create a test JPEG image with solid color
+     * Create a test image with solid color
      */
-    private function createTestImage(int $width, int $height, array $color, string $filename): string
+    private function createTestImage(int $width, int $height, array $color, string $filename, string $format = 'jpeg'): string
     {
         $image = imagecreatetruecolor($width, $height);
         $fill = imagecolorallocate($image, $color[0], $color[1], $color[2]);
@@ -196,30 +191,10 @@ class GarmentColorExtractorTest extends TestCase
             mkdir($dir, 0755, true);
         }
 
-        imagejpeg($image, $path, 90);
-        imagedestroy($image);
-
-        return $filename;
-    }
-
-    /**
-     * Create a test PNG image with solid color
-     */
-    private function createTestImagePng(int $width, int $height, array $color, string $filename): string
-    {
-        $image = imagecreatetruecolor($width, $height);
-        $fill = imagecolorallocate($image, $color[0], $color[1], $color[2]);
-        imagefilledrectangle($image, 0, 0, $width - 1, $height - 1, $fill);
-
-        $path = Storage::disk('public')->path($filename);
-
-        // Ensure directory exists
-        $dir = dirname($path);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-
-        imagepng($image, $path);
+        match ($format) {
+            'png' => imagepng($image, $path),
+            default => imagejpeg($image, $path, 90),
+        };
         imagedestroy($image);
 
         return $filename;
@@ -255,7 +230,7 @@ class GarmentColorExtractorTest extends TestCase
     }
 
     /**
-     * Create an image with mostly white background and a small red square
+     * Create an image with mostly white background and a large red square (~30% area)
      */
     private function createImageWithWhiteBackground(int $width, int $height, string $filename): string
     {
@@ -265,17 +240,49 @@ class GarmentColorExtractorTest extends TestCase
         $white = imagecolorallocate($image, 255, 255, 255);
         imagefilledrectangle($image, 0, 0, $width - 1, $height - 1, $white);
 
-        // Add small red square (10% of image)
+        // Draw a red square covering ~30% of the image area
+        $squareSize = (int) round(sqrt($width * $height * 0.3));
         $red = imagecolorallocate($image, 255, 0, 0);
-        $squareSize = intdiv($width, 10);
-        imagefilledrectangle(
-            $image,
-            intdiv($width, 2) - intdiv($squareSize, 2),
-            intdiv($height, 2) - intdiv($squareSize, 2),
-            intdiv($width, 2) + intdiv($squareSize, 2),
-            intdiv($height, 2) + intdiv($squareSize, 2),
-            $red
-        );
+        $x1 = intdiv($width - $squareSize, 2);
+        $y1 = intdiv($height - $squareSize, 2);
+        imagefilledrectangle($image, $x1, $y1, $x1 + $squareSize - 1, $y1 + $squareSize - 1, $red);
+
+        $path = Storage::disk('public')->path($filename);
+
+        // Ensure directory exists
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        imagejpeg($image, $path, 90);
+        imagedestroy($image);
+
+        return $filename;
+    }
+
+    /**
+     * Create an image with many color bands (7 colors) for testing max colors
+     */
+    private function createManyColorsImage(int $width, int $height, string $filename): string
+    {
+        $image = imagecreatetruecolor($width, $height);
+        $colors = [
+            [255, 0, 0],     // Red
+            [0, 0, 255],     // Blue
+            [0, 128, 0],     // Green
+            [255, 255, 0],   // Yellow
+            [128, 0, 128],   // Purple
+            [255, 165, 0],   // Orange
+            [0, 128, 128],   // Teal
+        ];
+        $bandHeight = intdiv($height, count($colors));
+        foreach ($colors as $i => $c) {
+            $fill = imagecolorallocate($image, $c[0], $c[1], $c[2]);
+            $y1 = $i * $bandHeight;
+            $y2 = ($i === count($colors) - 1) ? $height - 1 : ($y1 + $bandHeight - 1);
+            imagefilledrectangle($image, 0, $y1, $width - 1, $y2, $fill);
+        }
 
         $path = Storage::disk('public')->path($filename);
 

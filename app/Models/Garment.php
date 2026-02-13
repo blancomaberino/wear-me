@@ -92,6 +92,15 @@ class Garment extends Model
         return $query->where('category', $category);
     }
 
+    public function scopeMissingColorTags($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('color_tags')
+              ->orWhere('color_tags', '[]')
+              ->orWhere('color_tags', 'null');
+        });
+    }
+
     protected static function booted(): void
     {
         static::deleting(function (Garment $garment) {

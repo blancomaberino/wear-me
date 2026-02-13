@@ -38,6 +38,12 @@ class GarmentColorExtractor
 
             // Resize to 100x100 for speed
             $resized = imagecreatetruecolor(100, 100);
+            // Preserve alpha for PNG/WebP transparency
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+            $transparent = imagecolorallocatealpha($resized, 0, 0, 0, 127);
+            imagefilledrectangle($resized, 0, 0, 99, 99, $transparent);
+            imagealphablending($resized, true);
             imagecopyresampled($resized, $image, 0, 0, 0, 0, 100, 100, $width, $height);
             imagedestroy($image);
 
@@ -143,6 +149,11 @@ class GarmentColorExtractor
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
                 $rgb = imagecolorat($image, $x, $y);
+                $alpha = ($rgb >> 24) & 0x7F;
+                // Skip fully or mostly transparent pixels (alpha > 64 out of 127)
+                if ($alpha > 64) {
+                    continue;
+                }
                 $r = ($rgb >> 16) & 0xFF;
                 $g = ($rgb >> 8) & 0xFF;
                 $b = $rgb & 0xFF;

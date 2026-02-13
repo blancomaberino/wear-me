@@ -34,14 +34,11 @@ class BackfillGarmentColors implements ShouldQueue, ShouldBeUnique
         $total = 0;
         $processed = 0;
         $failed = 0;
+        $skipped = 0;
 
         $this->user->garments()
-            ->where(function ($query) {
-                $query->whereNull('color_tags')
-                    ->orWhere('color_tags', '[]')
-                    ->orWhere('color_tags', 'null');
-            })
-            ->chunk(50, function ($garments) use ($extractor, &$total, &$processed, &$failed) {
+            ->missingColorTags()
+            ->chunkById(50, function ($garments) use ($extractor, &$total, &$processed, &$failed, &$skipped) {
                 foreach ($garments as $garment) {
                     $total++;
                     try {
@@ -49,6 +46,8 @@ class BackfillGarmentColors implements ShouldQueue, ShouldBeUnique
                         if (!empty($colors)) {
                             $garment->update(['color_tags' => $colors]);
                             $processed++;
+                        } else {
+                            $skipped++;
                         }
                     } catch (\Throwable $e) {
                         $failed++;
@@ -65,6 +64,7 @@ class BackfillGarmentColors implements ShouldQueue, ShouldBeUnique
             'total' => $total,
             'processed' => $processed,
             'failed' => $failed,
+            'skipped' => $skipped,
         ]);
     }
 }

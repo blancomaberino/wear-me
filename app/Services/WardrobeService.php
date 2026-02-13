@@ -21,10 +21,12 @@ class WardrobeService
 
         $garment = $user->garments()->create(array_merge($imageData, $data));
 
+        $updates = [];
+
         // Compute and store perceptual hash
         try {
             $hash = $this->duplicateService->computeHash($garment->path);
-            $garment->update(['perceptual_hash' => $hash]);
+            $updates['perceptual_hash'] = $hash;
         } catch (\Throwable $e) {
             // Non-critical: don't fail the upload if hash computation fails
         }
@@ -33,10 +35,14 @@ class WardrobeService
         try {
             $colors = $this->colorExtractor->extract($garment->path);
             if (!empty($colors)) {
-                $garment->update(['color_tags' => $colors]);
+                $updates['color_tags'] = $colors;
             }
         } catch (\Throwable $e) {
             // Non-critical: don't fail the upload if color detection fails
+        }
+
+        if (!empty($updates)) {
+            $garment->update($updates);
         }
 
         return $garment;
