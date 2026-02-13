@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Enums\GarmentCategory;
+use App\Jobs\BackfillGarmentColors;
 use App\Models\Garment;
 use App\Models\User;
 use App\Services\ImageProcessingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -307,5 +309,126 @@ class GarmentTest extends TestCase
                 ->has('garments', 1)
                 ->where('garments.0.clothing_type', 'jacket')
             );
+    }
+
+    public function test_user_can_update_garment_color_tags(): void
+    {
+        $user = User::factory()->create();
+        $garment = Garment::factory()->for($user)->create();
+
+        $colorTags = [
+            ['hex' => '#FF0000', 'name' => 'Red'],
+            ['hex' => '#0000FF', 'name' => 'Blue'],
+        ];
+
+        $this->actingAs($user)
+            ->patch(route('wardrobe.update', $garment), [
+                'name' => $garment->name,
+                'category' => $garment->category->value,
+                'color_tags' => $colorTags,
+            ])
+            ->assertRedirect();
+
+        $garment->refresh();
+        $this->assertEquals($colorTags, $garment->color_tags);
+    }
+
+    public function test_color_tags_validation_rejects_invalid_hex(): void
+    {
+        $user = User::factory()->create();
+        $garment = Garment::factory()->for($user)->create();
+
+        $this->actingAs($user)
+            ->patch(route('wardrobe.update', $garment), [
+                'name' => $garment->name,
+                'category' => $garment->category->value,
+                'color_tags' => [
+                    ['hex' => 'not-a-hex', 'name' => 'Bad'],
+                ],
+            ])
+            ->assertSessionHasErrors();
+    }
+
+    public function test_color_tags_validation_rejects_more_than_ten(): void
+    {
+        $user = User::factory()->create();
+        $garment = Garment::factory()->for($user)->create();
+
+        $colorTags = [];
+        for ($i = 0; $i < 11; $i++) {
+            $colorTags[] = ['hex' => sprintf('#%02X%02X00', $i * 20, 100), 'name' => 'Red'];
+        }
+
+        $this->actingAs($user)
+            ->patch(route('wardrobe.update', $garment), [
+                'name' => $garment->name,
+                'category' => $garment->category->value,
+                'color_tags' => $colorTags,
+            ])
+            ->assertSessionHasErrors();
+    }
+
+    public function test_color_tags_validation_allows_empty_array(): void
+    {
+        $user = User::factory()->create();
+        $garment = Garment::factory()->for($user)->create();
+
+        $this->actingAs($user)
+            ->patch(route('wardrobe.update', $garment), [
+                'name' => $garment->name,
+                'category' => $garment->category->value,
+                'color_tags' => [],
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+    }
+
+    public function test_color_tags_validation_requires_name_with_hex(): void
+    {
+        $user = User::factory()->create();
+        $garment = Garment::factory()->for($user)->create();
+
+        $this->actingAs($user)
+            ->patch(route('wardrobe.update', $garment), [
+                'name' => $garment->name,
+                'category' => $garment->category->value,
+                'color_tags' => [
+                    ['hex' => '#FF0000'],
+                ],
+            ])
+            ->assertSessionHasErrors();
+    }
+
+    public function test_backfill_colors_dispatches_job(): void
+    {
+        Queue::fake();
+
+        $user = User::factory()->create();
+        Garment::factory(3)->for($user)->create(['color_tags' => null]);
+
+        $this->actingAs($user)
+            ->post(route('wardrobe.backfill-colors'))
+            ->assertRedirect();
+
+        Queue::assertPushed(BackfillGarmentColors::class);
+    }
+
+    public function test_backfill_colors_returns_no_garments_message_when_all_have_colors(): void
+    {
+        $user = User::factory()->create();
+        Garment::factory(3)->for($user)->create([
+            'color_tags' => [['hex' => '#FF0000', 'name' => 'Red']],
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('wardrobe.backfill-colors'))
+            ->assertRedirect()
+            ->assertSessionHas('success');
+    }
+
+    public function test_backfill_colors_requires_authentication(): void
+    {
+        $this->post(route('wardrobe.backfill-colors'))
+            ->assertRedirect(route('login'));
     }
 }

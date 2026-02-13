@@ -29,6 +29,9 @@ class UpdateGarmentRequest extends FormRequest
             'measurement_inseam_cm' => 'nullable|numeric|min:0|max:300',
             'measurement_shoulder_cm' => 'nullable|numeric|min:0|max:300',
             'measurement_sleeve_cm' => 'nullable|numeric|min:0|max:300',
+            'color_tags' => 'nullable|array|max:10',
+            'color_tags.*.hex' => 'required_with:color_tags|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'color_tags.*.name' => ['required_with:color_tags', 'string', 'max:50', 'regex:/^[a-zA-Z \-]+$/'],
         ];
     }
 }

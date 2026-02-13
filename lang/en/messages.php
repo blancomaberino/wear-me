@@ -31,4 +31,6 @@ return [
     'packing_list_deleted' => 'Packing list deleted successfully.',
     'export_started' => 'Export started. You will be notified when ready.',
     'garmentLimitReached' => 'Maximum of 200 garments allowed.',
+    'no_garments_to_backfill' => 'All garments already have colors detected.',
+    'color_backfill_started' => 'Color detection started for :count garments. This may take a few minutes.',
 ];

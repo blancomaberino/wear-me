@@ -9,10 +9,10 @@ import ExportDialog from '@/Components/ExportDialog';
 import { Button } from '@/Components/ui/Button';
 import { Tabs } from '@/Components/ui/Tabs';
 import { EmptyState } from '@/Components/ui/EmptyState';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import { Garment, User } from '@/types';
 import { useState } from 'react';
-import { Plus, Shirt, Upload, Link2, Download } from 'lucide-react';
+import { Plus, Shirt, Upload, Link2, Download, Palette } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -29,8 +29,16 @@ export default function Index({ garments, currentCategory }: Props) {
     const [showExport, setShowExport] = useState(false);
     const [selectedGarment, setSelectedGarment] = useState<Garment | null>(null);
     const [activeTab, setActiveTab] = useState(currentCategory || 'all');
+    const [detectingColors, setDetectingColors] = useState(false);
     const { auth } = usePage().props as any;
     const user: User = auth.user;
+
+    const handleDetectColors = () => {
+        setDetectingColors(true);
+        router.post(route('wardrobe.backfill-colors'), {}, {
+            onFinish: () => setDetectingColors(false),
+        });
+    };
 
     const filtered = activeTab === 'all' ? garments : garments.filter((g) => g.category === activeTab);
 
@@ -57,6 +65,9 @@ export default function Index({ garments, currentCategory }: Props) {
                 description={t('wardrobe.count', { count: garments.length })}
                 actions={
                     <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={handleDetectColors} disabled={detectingColors || garments.length === 0}>
+                            <Palette className="h-4 w-4" /> {detectingColors ? t('wardrobe.detectingColors') : t('wardrobe.detectColors')}
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => setShowImportUrl(true)}>
                             <Link2 className="h-4 w-4" /> {t('wardrobe.importUrl')}
                         </Button>

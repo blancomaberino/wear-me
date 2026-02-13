@@ -18,7 +18,10 @@ class GarmentFactory extends Factory
             'category' => fake()->randomElement(GarmentCategory::cases()),
             'name' => fake()->words(2, true),
             'description' => fake()->sentence(),
-            'color_tags' => [fake()->colorName(), fake()->colorName()],
+            'color_tags' => [
+                ['hex' => fake()->hexColor(), 'name' => fake()->colorName()],
+                ['hex' => fake()->hexColor(), 'name' => fake()->colorName()],
+            ],
         ];
     }
 

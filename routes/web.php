@@ -123,6 +123,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/wardrobe', [GarmentController::class, 'store'])->name('wardrobe.store');
         Route::post('/wardrobe/bulk', [GarmentController::class, 'bulkStore'])->name('wardrobe.bulk');
     });
+
+    // Rate-limited: expensive background jobs (3 per minute)
+    Route::middleware('throttle:3,1')->group(function () {
+        Route::post('/wardrobe/backfill-colors', [GarmentController::class, 'backfillColors'])->name('wardrobe.backfill-colors');
+    });
 });
 
 // Public share routes (no auth)

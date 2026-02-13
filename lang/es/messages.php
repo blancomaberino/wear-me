@@ -31,4 +31,6 @@ return [
     'packing_list_deleted' => 'Lista de equipaje eliminada con éxito.',
     'export_started' => 'Exportacion iniciada. Se te notificara cuando este lista.',
     'garmentLimitReached' => 'Máximo de 200 prendas permitidas.',
+    'no_garments_to_backfill' => 'Todas las prendas ya tienen colores detectados.',
+    'color_backfill_started' => 'Detección de colores iniciada para :count prendas. Esto puede tomar unos minutos.',
 ];

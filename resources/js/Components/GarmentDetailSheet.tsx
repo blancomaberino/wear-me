@@ -2,6 +2,7 @@ import { Dialog } from '@/Components/ui/Dialog';
 import { Button } from '@/Components/ui/Button';
 import { Input } from '@/Components/ui/Input';
 import { Badge } from '@/Components/ui/Badge';
+import ColorTagEditor from '@/Components/ColorTagEditor';
 import { Garment } from '@/types';
 import { useForm, router } from '@inertiajs/react';
 import { FormEventHandler, useState, useEffect } from 'react';
@@ -23,6 +24,7 @@ export default function GarmentDetailSheet({ garment, open, onClose }: Props) {
         brand: g?.brand || '',
         material: g?.material || '',
         size_label: g?.size_label || '',
+        color_tags: g?.color_tags || [],
         measurement_chest_cm: g?.measurement_chest_cm ?? '',
         measurement_length_cm: g?.measurement_length_cm ?? '',
         measurement_waist_cm: g?.measurement_waist_cm ?? '',
@@ -67,6 +69,12 @@ export default function GarmentDetailSheet({ garment, open, onClose }: Props) {
                     {garment.size_label && <Badge variant="neutral">{garment.size_label}</Badge>}
                     {garment.brand && <Badge variant="neutral">{garment.brand}</Badge>}
                 </div>
+
+                {/* Color Tags */}
+                <ColorTagEditor
+                    colors={data.color_tags || []}
+                    onChange={(colors) => setData('color_tags', colors)}
+                />
 
                 {/* Edit Form */}
                 <form onSubmit={submit} className="space-y-4">

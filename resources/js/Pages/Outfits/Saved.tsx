@@ -80,7 +80,7 @@ export default function Saved({ suggestions, lookbooks }: Props) {
 
                                 {suggestion.garments.length >= 2 && (
                                     <HarmonyBadge
-                                        colors={suggestion.garments.flatMap((g: any) => g.color_tags || [])}
+                                        colors={suggestion.garments.flatMap((g: any) => (g.color_tags || []).map((c: any) => typeof c === 'string' ? c : c.hex))}
                                         score={suggestion.harmony_score}
                                         className="mb-3"
                                     />

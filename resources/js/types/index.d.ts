@@ -51,7 +51,7 @@ export interface Garment {
     name: string | null;
     category: 'upper' | 'lower' | 'dress';
     description?: string | null;
-    color_tags?: string[] | null;
+    color_tags?: Array<{ hex: string; name: string }> | null;
     size_label?: string | null;
     brand?: string | null;
     material?: string | null;
@@ -119,7 +119,7 @@ export interface OutfitSuggestion {
         name: string;
         thumbnail_url: string | null;
         category: string;
-        color_tags?: string[] | null;
+        color_tags?: Array<{ hex: string; name: string }> | null;
     }[];
     suggestion_text: string;
     occasion: string | null;

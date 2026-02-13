@@ -7,6 +7,7 @@ use App\Http\Requests\BulkStoreGarmentRequest;
 use App\Http\Requests\StoreGarmentRequest;
 use App\Http\Requests\UpdateGarmentRequest;
 use App\Http\Resources\GarmentResource;
+use App\Jobs\BackfillGarmentColors;
 use App\Jobs\ProcessBulkGarment;
 use App\Models\Garment;
 use App\Models\User;
@@ -91,6 +92,7 @@ class GarmentController extends Controller
             'name', 'description', 'category', 'clothing_type', 'size_label', 'brand', 'material',
             'measurement_chest_cm', 'measurement_length_cm', 'measurement_waist_cm',
             'measurement_inseam_cm', 'measurement_shoulder_cm', 'measurement_sleeve_cm',
+            'color_tags',
         ]));
 
         return redirect()->back()->with('success', __('messages.garment_updated'));
@@ -103,5 +105,22 @@ class GarmentController extends Controller
         $this->wardrobeService->deleteGarment($garment);
 
         return redirect()->back()->with('success', __('messages.garment_deleted'));
+    }
+
+    public function backfillColors(Request $request)
+    {
+        $user = $request->user();
+
+        $pendingCount = $user->garments()
+            ->missingColorTags()
+            ->count();
+
+        if ($pendingCount === 0) {
+            return redirect()->back()->with('success', __('messages.no_garments_to_backfill'));
+        }
+
+        BackfillGarmentColors::dispatch($user);
+
+        return redirect()->back()->with('success', __('messages.color_backfill_started', ['count' => $pendingCount]));
     }
 }
